@@ -69,7 +69,6 @@ public class UploaderPanel extends JPanel {
 
         pnlCmds.add(Box.createHorizontalGlue());
         pnlCmds.add(create_upload_panel());
-
         return pnlCmds;
     }
 
@@ -115,13 +114,11 @@ public class UploaderPanel extends JPanel {
     }
 
     private JScrollPane create_upload_list() {
-        JPanel pnlUploadList = new JPanel();
         pnlUploadList.setLayout(new BoxLayout(pnlUploadList, BoxLayout.Y_AXIS));
-        pnlUploadList.setOpaque(false);
+        pnlUploadList.setBackground(BG_COLOR);
         pnlUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JScrollPane spUploadList = new JScrollPane(pnlUploadList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        spUploadList.setOpaque(false);
         spUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
         return spUploadList;
    }
