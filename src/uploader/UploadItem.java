@@ -23,13 +23,15 @@ public class UploadItem extends JPanel {
     private static final ImageIcon ICON_CLOSE = Util.createImageIcon("/resources/close.png");
     private static final ImageIcon ICON_CLOSE_PRESSED = Util.createImageIcon("/resources/close-press.png");
     private static final ImageIcon ICON_CLOSE_HOVER = Util.createImageIcon("/resources/close-hover.png");
+    private static final ImageIcon ICON_CHECKMARK = Util.createImageIcon("/resources/checkmark.png");
 
     private final UploaderThread uploader;
     private final String fn;
     private final long szBytes;
     private long numBytesUploaded = 0;
 
-    private final JLabel lblProgress = new JLabel("not yet uploaded");
+    private final JLabel lblProgress = new JLabel("not yet uploaded", JLabel.RIGHT);
+    private final JButton btnRemove;
 
     public UploadItem(UploaderThread uploader, final String filename, final long sizeInBytes) {
         this.uploader = uploader;
@@ -63,7 +65,7 @@ public class UploadItem extends JPanel {
         add(lblProgress);
         add(Box.createRigidArea(new Dimension(5, 0)));
 
-        JButton btnRemove = new JButton(ICON_CLOSE);
+        btnRemove = new JButton(ICON_CLOSE);
         btnRemove.setPressedIcon(ICON_CLOSE_PRESSED);
         btnRemove.setRolloverIcon(ICON_CLOSE_HOVER);
         btnRemove.setFocusPainted(false);
@@ -76,7 +78,8 @@ public class UploadItem extends JPanel {
         btnRemove.setMaximumSize(btnRmSz);
         btnRemove.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                removeItemFromUploader();
+                if(!isUploaded())
+                    removeItemFromUploader();
             }
         });
         add(btnRemove);
@@ -86,6 +89,11 @@ public class UploadItem extends JPanel {
     /** returns the percentage of this item which has been uploaded [0.0,1.0] */
     public double getPercentUploaded() {
         return numBytesUploaded / (double)szBytes;
+    }
+
+    /** returns true if the item has been completely uploaded */
+    public boolean isUploaded() {
+        return numBytesUploaded == szBytes;
     }
 
     /** paints the background color to reflect how far completed this upload is */
@@ -106,5 +114,23 @@ public class UploadItem extends JPanel {
     /** asks the uploader to remove it from its upload queue */
     private void removeItemFromUploader() {
         uploader.removeItemToUpload(this);
+    }
+
+    /**
+     * Sets the number of bytes of this item which have been uploaded.  When all
+     * bytes have been uploaded, the remove button is replaced with a static
+     * checkmark.  The progress text for this item is appropriately updated.
+     */
+    public void setNumBytesUploaded(long n) {
+        numBytesUploaded = n;
+        if(isUploaded()) {
+            btnRemove.setIcon(ICON_CHECKMARK);
+            btnRemove.setPressedIcon(ICON_CHECKMARK);
+            btnRemove.setRolloverIcon(ICON_CHECKMARK);
+            lblProgress.setText("uploaded!");
+        }
+        else {
+            lblProgress.setText(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded");
+        }
     }
 }
