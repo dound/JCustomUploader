@@ -57,7 +57,7 @@ public class UploaderPanel extends JPanel {
         add(create_upload_list());
         add(create_footer_panel());
 
-        uploader.run();
+        uploader.start();
     }
 
     private JPanel create_commands_panel() {
