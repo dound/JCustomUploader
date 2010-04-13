@@ -19,6 +19,8 @@ public class UploadItem extends JPanel {
     private static final Color COLOR_UPLOAD_PROGRESS = new Color(196, 255, 196);
     private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
     private static final ImageIcon ICON_CLOSE = Util.createImageIcon("/resources/close.png");
+    private static final ImageIcon ICON_CLOSE_PRESSED = Util.createImageIcon("/resources/close-press.png");
+    private static final ImageIcon ICON_CLOSE_HOVER = Util.createImageIcon("/resources/close-hover.png");
 
     private final String fn;
     private final int szBytes;
@@ -58,7 +60,10 @@ public class UploadItem extends JPanel {
         add(Box.createRigidArea(new Dimension(5, 0)));
 
         JButton btnRemove = new JButton(ICON_CLOSE);
-        btnRemove.setBackground(Color.WHITE);
+        btnRemove.setPressedIcon(ICON_CLOSE_PRESSED);
+        btnRemove.setRolloverIcon(ICON_CLOSE_HOVER);
+        btnRemove.setFocusPainted(false);
+        btnRemove.setContentAreaFilled(false);
         btnRemove.setBorderPainted(false);
         btnRemove.setToolTipText("Don't upload this photo");
         Dimension btnRmSz = new Dimension(17, 22);
