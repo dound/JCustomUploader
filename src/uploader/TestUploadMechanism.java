@@ -11,6 +11,7 @@ import java.util.Random;
  */
 public class TestUploadMechanism implements UploadMechanism {
     private final Random rand;
+    private long chunkXferTime_ms;
     private double chanceStartFails;
     private double chanceNextChunkFails;
 
@@ -23,17 +24,20 @@ public class TestUploadMechanism implements UploadMechanism {
      * Constructs a test upload mechanism with the specified failure chances
      * with random seeded to the current time.
      */
-    public TestUploadMechanism(double chanceStartFails, double chanceNextChunkFails) {
-        this(chanceStartFails, chanceNextChunkFails, System.currentTimeMillis());
+    public TestUploadMechanism(long chunkXferTime_ms, double chanceStartFails, double chanceNextChunkFails) {
+        this(chunkXferTime_ms, chanceStartFails, chanceNextChunkFails, System.currentTimeMillis());
     }
 
     /**
-     * Constructs a test upload mechanism with the specified failure chances
+     * Constructs a test upload mechanism with the specified chunk transfer
+     * time (how long uploadNextChunk() will block for), failure chances,
      * and random seed.  Failure chances should be in the range [0.0, 1.0]
      * (e.g., 0.25 => 25% chance of failure).  chanceNextChunkFails will be
-     * called a lot for large files, so you may want to consider
+     * called a lot for large files, so you may want to consider using a smaller
+     * value for this.
      */
-    public TestUploadMechanism(double chanceStartFails, double chanceNextChunkFails, long seed) {
+    public TestUploadMechanism(long chunkXferTime_ms, double chanceStartFails, double chanceNextChunkFails, long seed) {
+        this.chunkXferTime_ms = chunkXferTime_ms;
         this.chanceStartFails = chanceStartFails;
         this.chanceNextChunkFails = chanceNextChunkFails;
         this.rand = new Random(seed);
@@ -95,6 +99,9 @@ public class TestUploadMechanism implements UploadMechanism {
         else {
             long max = sz - offset;
             offset += max;
+            if(max > 0) {
+                try { Thread.sleep(this.chunkXferTime_ms); } catch(InterruptedException e) {}
+            }
             return Math.min(max, numBytesToUpload);
         }
     }
