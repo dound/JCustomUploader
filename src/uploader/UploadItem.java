@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,6 +18,7 @@ import javax.swing.JTextField;
 public class UploadItem extends JPanel {
     private static final Color COLOR_UPLOAD_PROGRESS = new Color(196, 255, 196);
     private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
+    private static final ImageIcon ICON_CLOSE = Util.createImageIcon("/resources/close.png");
 
     private final String fn;
     private final int szBytes;
@@ -55,8 +57,16 @@ public class UploadItem extends JPanel {
         add(lblProgress);
         add(Box.createRigidArea(new Dimension(5, 0)));
 
-        JButton btnRemove = new JButton("X");
+        JButton btnRemove = new JButton(ICON_CLOSE);
+        btnRemove.setBackground(Color.WHITE);
+        btnRemove.setBorderPainted(false);
+        btnRemove.setToolTipText("Don't upload this photo");
+        Dimension btnRmSz = new Dimension(17, 22);
+        btnRemove.setMinimumSize(btnRmSz);
+        btnRemove.setPreferredSize(btnRmSz);
+        btnRemove.setMaximumSize(btnRmSz);
         add(btnRemove);
+        add(Box.createRigidArea(new Dimension(5, 0)));
     }
 
     /** returns the percentage of this item which has been uploaded [0.0,1.0] */

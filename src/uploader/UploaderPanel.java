@@ -3,11 +3,13 @@ package uploader;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -18,6 +20,7 @@ import javax.swing.border.EmptyBorder;
 public class UploaderPanel extends JPanel {
     private static final int MARGIN_SIZE = 5;
     public static final Color BG_COLOR = Color.WHITE;
+    private static final ImageIcon ICON_ADD = Util.createImageIcon("/resources/add.png");
 
     private final JLabel txtPending = new JLabel("No photos added yet.");
     private final JLabel txtUploaded = new JLabel("No photos uploaded yet.");
@@ -39,7 +42,8 @@ public class UploaderPanel extends JPanel {
         pnlCmds.setOpaque(false);
         pnlCmds.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton btnAddImages = new JButton("Add images");
+        JButton btnAddImages = new JButton("Add images", ICON_ADD);
+        btnAddImages.setMargin(new Insets(2,2,2,10));
         pnlCmds.add(btnAddImages);
         btnAddImages.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -49,7 +53,8 @@ public class UploaderPanel extends JPanel {
 
         pnlCmds.add(Box.createRigidArea(new Dimension(15, 0)));
 
-        JButton btnAddFolder = new JButton("Add all images in a folder");
+        JButton btnAddFolder = new JButton("Add all images in a folder", ICON_ADD);
+        btnAddFolder.setMargin(new Insets(2,2,2,10));
         pnlCmds.add(btnAddFolder);
         btnAddFolder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
