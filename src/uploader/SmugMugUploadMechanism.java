@@ -20,7 +20,7 @@ public class SmugMugUploadMechanism implements UploadMechanism {
         return false;
     }
 
-    public boolean startUpload(String fn, long numBytes) {
+    public boolean startUpload(String fn) {
         // TODO Auto-generated method stub
         return false;
     }

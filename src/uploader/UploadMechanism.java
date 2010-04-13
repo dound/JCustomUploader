@@ -16,7 +16,7 @@ public interface UploadMechanism {
      * Called once for each file which is to be uploaded.  Initiates the upload.
      * @return true if the initialization to start the upload succeeded
      */
-    public boolean startUpload(String fn, long num_bytes);
+    public boolean startUpload(String fn);
 
     /**
      * Called until this method returns false or isUploadComplete() returns true.

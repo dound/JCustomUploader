@@ -83,7 +83,7 @@ public class UploadManager extends Thread {
         }
 
         // initialize the upload process
-        if(!uploadMech.startUpload(item.getFilename(), item.length())) {
+        if(!uploadMech.startUpload(item.getFilename())) {
             cancelCurrentUpload(uploadMech.getErrorText());
             return;
         }
@@ -100,7 +100,7 @@ public class UploadManager extends Thread {
                 item.incrNumBytesUploaded(bytes_uploaded);
 
             // check to see if the upload is done
-            if(item.isUploaded()) {
+            if(uploadMech.isUploadComplete()) {
                 synchronized(this) {
                     itemBeingUploaded = null;
                 }
