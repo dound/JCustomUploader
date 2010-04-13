@@ -60,8 +60,8 @@ public class TestUploadMechanism implements UploadMechanism {
     }
 
     public boolean startUpload(String fn) {
-        if(currentUpload == null) {
-            haltWithError("no upload is in progress");
+        if(currentUpload != null) {
+            haltWithError("an upload is already in progress");
             return false;
         }
 
@@ -80,6 +80,7 @@ public class TestUploadMechanism implements UploadMechanism {
                 return false;
             }
 
+            currentUpload = fn;
             offset = 0;
             sz = f.length();
             return true;
