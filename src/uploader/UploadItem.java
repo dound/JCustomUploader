@@ -86,9 +86,29 @@ public class UploadItem extends JPanel {
         add(Box.createRigidArea(new Dimension(5, 0)));
     }
 
+    /** returns the size of the file */
+    public long length() {
+        return szBytes;
+    }
+
+    /** returns the filename of this item */
+    public String getFilename() {
+        return fn;
+    }
+
     /** returns the percentage of this item which has been uploaded [0.0,1.0] */
     public double getPercentUploaded() {
         return numBytesUploaded / (double)szBytes;
+    }
+
+    /** returns the text associated with the progress label */
+    public String getProgressText() {
+        return lblProgress.getText();
+    }
+
+    /** sets the text associated with the progress label */
+    public void setProgressText(String s) {
+        lblProgress.setText(s);
     }
 
     /** returns true if the item has been completely uploaded */
@@ -116,6 +136,11 @@ public class UploadItem extends JPanel {
         uploader.removeItemToUpload(this);
     }
 
+    /** returns the number of bytes uploaded */
+    public long getNumBytesUploaded() {
+        return numBytesUploaded;
+    }
+
     /**
      * Sets the number of bytes of this item which have been uploaded.  When all
      * bytes have been uploaded, the remove button is replaced with a static
@@ -127,10 +152,15 @@ public class UploadItem extends JPanel {
             btnRemove.setIcon(ICON_CHECKMARK);
             btnRemove.setPressedIcon(ICON_CHECKMARK);
             btnRemove.setRolloverIcon(ICON_CHECKMARK);
-            lblProgress.setText("uploaded!");
+            setProgressText("uploaded!");
         }
         else {
-            lblProgress.setText(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded");
+            setProgressText(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded");
         }
+    }
+
+    /** convenience wrapper for setNumBytesUploaded() */
+    public void incrNumBytesUploaded(long bytesUploaded) {
+        setNumBytesUploaded(numBytesUploaded + bytesUploaded);
     }
 }
