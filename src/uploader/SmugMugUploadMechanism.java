@@ -29,4 +29,9 @@ public class SmugMugUploadMechanism implements UploadMechanism {
         // TODO Auto-generated method stub
         return 0;
     }
+
+    public long getSizeOfCurrentUpload() {
+        // TODO
+        return 0;
+    }
 }

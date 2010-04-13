@@ -87,6 +87,7 @@ public class UploadManager extends Thread {
             cancelCurrentUpload(uploadMech.getErrorText());
             return;
         }
+        item.setItemSize(uploadMech.getSizeOfCurrentUpload()); // just in case the file size changed
 
         // loop until the upload is canceled or done
         while(item!=null) {
@@ -102,6 +103,7 @@ public class UploadManager extends Thread {
             // check to see if the upload is done
             if(uploadMech.isUploadComplete()) {
                 synchronized(this) {
+                    item.setNumBytesUploaded(item.length()); // 100% complete
                     itemBeingUploaded = null;
                 }
                 return;

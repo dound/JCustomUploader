@@ -27,7 +27,7 @@ public class UploadItem extends JPanel {
 
     private final UploadManager uploader;
     private final String fn;
-    private final long szBytes;
+    private long szBytes;
     private long numBytesUploaded = 0;
 
     private final JLabel lblProgress = new JLabel("not yet uploaded", JLabel.RIGHT);
@@ -89,6 +89,12 @@ public class UploadItem extends JPanel {
     /** returns the size of the file */
     public long length() {
         return szBytes;
+    }
+
+    /** sets the size of the file (use this if the size has changed) */
+    public void setItemSize(long sizeOfCurrentUpload) {
+        szBytes = sizeOfCurrentUpload;
+        this.repaint();
     }
 
     /** returns the filename of this item */

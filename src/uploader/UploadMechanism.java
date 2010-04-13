@@ -43,4 +43,7 @@ public interface UploadMechanism {
      * Gets a human-readable string describing the most recent error, if any.
      */
     public String getErrorText();
+
+    /** Gets the number of bytes to be uploaded for the current file. */
+    public long getSizeOfCurrentUpload();
 }
