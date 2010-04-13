@@ -1,5 +1,6 @@
 package uploader;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -16,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 
 public class UploaderPanel extends JPanel {
     private static final int MARGIN_SIZE = 5;
+    public static final Color BG_COLOR = Color.WHITE;
 
     private final JLabel txtPending = new JLabel("No photos added yet.");
     private final JLabel txtUploaded = new JLabel("No photos uploaded yet.");
@@ -23,6 +25,7 @@ public class UploaderPanel extends JPanel {
     public UploaderPanel() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(new EmptyBorder(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE));
+        this.setBackground(BG_COLOR);
 
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));
@@ -33,6 +36,7 @@ public class UploaderPanel extends JPanel {
     private JPanel create_commands_panel() {
         JPanel pnlCmds = new JPanel();
         pnlCmds.setLayout(new BoxLayout(pnlCmds, BoxLayout.X_AXIS));
+        pnlCmds.setOpaque(false);
         pnlCmds.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton btnAddImages = new JButton("Add images");
@@ -62,6 +66,7 @@ public class UploaderPanel extends JPanel {
     private JPanel create_upload_panel() {
         final JPanel pnlUpload = new JPanel();
         pnlUpload.setLayout(new BoxLayout(pnlUpload, BoxLayout.X_AXIS));
+        pnlUpload.setOpaque(false);
         pnlUpload.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
         final JCheckBox chkUploading = new JCheckBox("Upload photos as I add them", true);
@@ -69,14 +74,17 @@ public class UploaderPanel extends JPanel {
         pnlUpload.add(Box.createHorizontalGlue());
         pnlUpload.add(chkUploading);
         pnlUpload.add(btnUploadNow);
-        btnUploadNow.setVisible(false);
 
+        chkUploading.setOpaque(false);
         chkUploading.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 chkUploading.setVisible(false);
                 btnUploadNow.setVisible(true);
             }
         });
+
+        btnUploadNow.setVisible(false);
+        btnUploadNow.setOpaque(false);
         btnUploadNow.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 btnUploadNow.setVisible(false);
@@ -98,11 +106,13 @@ public class UploaderPanel extends JPanel {
 
     private JScrollPane create_upload_list() {
         JPanel pnlUploadList = new JPanel();
-        JScrollPane spUploadList = new JScrollPane(pnlUploadList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        spUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        pnlUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
         pnlUploadList.setLayout(new BoxLayout(pnlUploadList, BoxLayout.Y_AXIS));
+        pnlUploadList.setOpaque(false);
+        pnlUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JScrollPane spUploadList = new JScrollPane(pnlUploadList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        spUploadList.setOpaque(false);
+        spUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // TODO: remove these example entries
         for(int i=0; i<25; i++)
@@ -114,6 +124,7 @@ public class UploaderPanel extends JPanel {
 
    private JPanel create_footer_panel() {
         JPanel pnlFooter = new JPanel();
+        pnlFooter.setOpaque(false);
         pnlFooter.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         pnlFooter.setLayout(new BoxLayout(pnlFooter, BoxLayout.Y_AXIS));

@@ -73,7 +73,7 @@ public class UploadItem extends JPanel {
         g2d.setColor(COLOR_UPLOAD_PROGRESS);
         g2d.fillRect(0, 0, perDoneX, getHeight());
 
-        g2d.setColor(this.getBackground());
+        g2d.setColor(UploaderPanel.BG_COLOR);
         g2d.fillRect(perDoneX, 0, getWidth(), getHeight());
 
         g2d.setColor(c);
