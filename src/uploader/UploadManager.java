@@ -143,16 +143,24 @@ public class UploadManager extends Thread {
 
     /** removes an item from the upload queue */
     public void removeItemToUpload(UploadItem item) {
+        synchronized(this) {
+            if(item == itemBeingUploaded)
+                cancelCurrentUpload("canceled by user"); // try to halt the upload in progress
+            else {
+                try {
+                    uploadQueue.remove(item); // remove it from the upload queue (hasn't started yet)
+                }
+                catch(NoSuchElementException e) {
+                    // too late: it has already been uploaded
+                    return;
+                }
+            }
+        }
+
+        item.setProgressText("canceled by user");
         pnlUploadItems.remove(item);
         pnlUploadItems.validate();
         pnlUploadItems.repaint();
-
-        synchronized(this) {
-            if(item == itemBeingUploaded)
-                itemBeingUploaded = null;   // try to halt the upload in progress
-            else
-                uploadQueue.remove(item); // remove it from the upload queue (hasn't started yet)
-        }
     }
 
     /** sets whether uploads may be done */
