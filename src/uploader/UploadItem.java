@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
 import javax.swing.Box;
@@ -22,13 +24,15 @@ public class UploadItem extends JPanel {
     private static final ImageIcon ICON_CLOSE_PRESSED = Util.createImageIcon("/resources/close-press.png");
     private static final ImageIcon ICON_CLOSE_HOVER = Util.createImageIcon("/resources/close-hover.png");
 
+    private final UploaderThread uploader;
     private final String fn;
-    private final int szBytes;
-    private int numBytesUploaded = 0;
+    private final long szBytes;
+    private long numBytesUploaded = 0;
 
     private final JLabel lblProgress = new JLabel("not yet uploaded");
 
-    public UploadItem(final String filename, final int sizeInBytes) {
+    public UploadItem(UploaderThread uploader, final String filename, final long sizeInBytes) {
+        this.uploader = uploader;
         this.fn = filename;
         this.szBytes = sizeInBytes;
 
@@ -70,6 +74,11 @@ public class UploadItem extends JPanel {
         btnRemove.setMinimumSize(btnRmSz);
         btnRemove.setPreferredSize(btnRmSz);
         btnRemove.setMaximumSize(btnRmSz);
+        btnRemove.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                removeItemFromUploader();
+            }
+        });
         add(btnRemove);
         add(Box.createRigidArea(new Dimension(5, 0)));
     }
@@ -92,5 +101,10 @@ public class UploadItem extends JPanel {
         g2d.fillRect(perDoneX, 0, getWidth(), getHeight());
 
         g2d.setColor(c);
+    }
+
+    /** asks the uploader to remove it from its upload queue */
+    private void removeItemFromUploader() {
+        uploader.removeItemToUpload(this);
     }
 }

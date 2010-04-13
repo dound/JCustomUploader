@@ -123,12 +123,6 @@ public class UploaderPanel extends JPanel {
         JScrollPane spUploadList = new JScrollPane(pnlUploadList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         spUploadList.setOpaque(false);
         spUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // TODO: remove these example entries
-        for(int i=0; i<25; i++)
-            pnlUploadList.add(new UploadItem("/home/dgu/magic1", i*100+100));
-        pnlUploadList.add(new UploadItem("/home/dgu/more/magic2/fgjsdklgjsdfgj/sdfgsdfgs/sdfgsdfgfsdgsdfgljk/sdfgsdfgsdfg/helloworld", 512*1024));
-
         return spUploadList;
    }
 
