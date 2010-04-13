@@ -123,7 +123,7 @@ public class UploadManager extends Thread {
     /** cancels the current upload, if any */
     private synchronized void cancelCurrentUpload(String why) {
         if(itemBeingUploaded != null) {
-            itemBeingUploaded.setProgressText(why);
+            itemBeingUploaded.setProgressText(why, true);
             itemBeingUploaded = null;
         }
     }
@@ -159,7 +159,7 @@ public class UploadManager extends Thread {
             }
         }
 
-        item.setProgressText("canceled by user");
+        item.setProgressText("canceled by user", true);
         pnlUploadItems.remove(item);
         pnlUploadItems.validate();
         pnlUploadItems.repaint();

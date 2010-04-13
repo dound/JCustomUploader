@@ -24,6 +24,7 @@ public class UploadItem extends JPanel {
     private static final ImageIcon ICON_CLOSE_PRESSED = Util.createImageIcon("/resources/close-press.png");
     private static final ImageIcon ICON_CLOSE_HOVER = Util.createImageIcon("/resources/close-hover.png");
     private static final ImageIcon ICON_CHECKMARK = Util.createImageIcon("/resources/checkmark.png");
+    private static final ImageIcon ICON_ALERT = Util.createImageIcon("/resources/alert.png");
 
     private final UploadManager uploader;
     private final String fn;
@@ -113,8 +114,16 @@ public class UploadItem extends JPanel {
     }
 
     /** sets the text associated with the progress label */
-    public void setProgressText(String s) {
+    public void setProgressText(String s, boolean showAlert) {
         lblProgress.setText(s);
+        if(showAlert) {
+            lblProgress.setIcon(ICON_ALERT);
+            lblProgress.setForeground(Color.RED);
+        }
+        else {
+            lblProgress.setIcon(null);
+            lblProgress.setForeground(Color.BLACK);
+        }
     }
 
     /** returns true if the item has been completely uploaded */
@@ -158,11 +167,12 @@ public class UploadItem extends JPanel {
             btnRemove.setIcon(ICON_CHECKMARK);
             btnRemove.setPressedIcon(ICON_CHECKMARK);
             btnRemove.setRolloverIcon(ICON_CHECKMARK);
-            setProgressText("uploaded!");
+            setProgressText("uploaded!", false);
         }
         else {
-            setProgressText(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded");
+            setProgressText(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded", false);
         }
+        this.repaint();
     }
 
     /** convenience wrapper for setNumBytesUploaded() */
