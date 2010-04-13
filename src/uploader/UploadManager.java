@@ -2,6 +2,7 @@ package uploader;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 import javax.swing.JPanel;
 
@@ -12,8 +13,13 @@ import javax.swing.JPanel;
  * @author David Underhill
  */
 public class UploadManager extends Thread {
+    private static final long CHUNK_SIZE = 4096;
+
     /** UI container which holds UploadItems */
     private final JPanel pnlUploadItems;
+
+    /** the object which will actually uploads each file */
+    final UploadMechanism uploadMech;
 
     /** list of items to upload */
     private final LinkedList<UploadItem> uploadQueue = new LinkedList<UploadItem>();
@@ -25,8 +31,9 @@ public class UploadManager extends Thread {
     private volatile UploadItem itemBeingUploaded = null;
 
     /** constructs a new UploaderThread which will put new UploadItems in p. */
-    public UploadManager(final JPanel p) {
+    public UploadManager(final JPanel p, final UploadMechanism uploadMech) {
         pnlUploadItems = p;
+        this.uploadMech = uploadMech;
     }
 
     /**
@@ -76,12 +83,21 @@ public class UploadManager extends Thread {
         }
 
         // initialize the upload process
-        // TODO: do whatever is required to start an upload
+        if(!uploadMech.startUpload(item.getFilename(), item.length())) {
+            cancelCurrentUpload(uploadMech.getErrorText());
+            return;
+        }
 
         // loop until the upload is canceled or done
         while(item!=null) {
             // upload the next chunk of this item
-            // TODO: upload a chunk!
+            long bytes_uploaded = uploadMech.uploadNextChunk(CHUNK_SIZE);
+            if(bytes_uploaded == -1L) {
+                cancelCurrentUpload(uploadMech.getErrorText());
+                return;
+            }
+            else
+                item.incrNumBytesUploaded(bytes_uploaded);
 
             // check to see if the upload is done
             if(item.isUploaded()) {
@@ -99,7 +115,15 @@ public class UploadManager extends Thread {
         }
 
         // the item's upload has been canceled, but we've partially uploaded it
-        // TODO: tell the server that the upload has been canceled
+        uploadMech.cancelUpload();
+    }
+
+    /** cancels the current upload, if any */
+    private synchronized void cancelCurrentUpload(String why) {
+        if(itemBeingUploaded != null) {
+            itemBeingUploaded.setProgressText(why);
+            itemBeingUploaded = null;
+        }
     }
 
     /** adds an item to the upload queue */

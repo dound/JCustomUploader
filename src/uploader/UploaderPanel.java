@@ -50,7 +50,7 @@ public class UploaderPanel extends JPanel {
         this.setBackground(BG_COLOR);
 
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-        uploader = new UploadManager(pnlUploadList);
+        uploader = new UploadManager(pnlUploadList, new SmugMugUploadMechanism());
 
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));
