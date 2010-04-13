@@ -25,7 +25,7 @@ public class UploadItem extends JPanel {
     private static final ImageIcon ICON_CLOSE_HOVER = Util.createImageIcon("/resources/close-hover.png");
     private static final ImageIcon ICON_CHECKMARK = Util.createImageIcon("/resources/checkmark.png");
 
-    private final UploaderThread uploader;
+    private final UploadManager uploader;
     private final String fn;
     private final long szBytes;
     private long numBytesUploaded = 0;
@@ -33,7 +33,7 @@ public class UploadItem extends JPanel {
     private final JLabel lblProgress = new JLabel("not yet uploaded", JLabel.RIGHT);
     private final JButton btnRemove;
 
-    public UploadItem(UploaderThread uploader, final String filename, final long sizeInBytes) {
+    public UploadItem(UploadManager uploader, final String filename, final long sizeInBytes) {
         this.uploader = uploader;
         this.fn = filename;
         this.szBytes = sizeInBytes;

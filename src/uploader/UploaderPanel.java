@@ -42,7 +42,7 @@ public class UploaderPanel extends JPanel {
     private final JPanel pnlUploadList = new JPanel();
     private final JLabel txtPending = new JLabel("No photos added yet.");
     private final JLabel txtUploaded = new JLabel("No photos uploaded yet.");
-    private final UploaderThread uploader;
+    private final UploadManager uploader;
 
     public UploaderPanel() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -50,7 +50,7 @@ public class UploaderPanel extends JPanel {
         this.setBackground(BG_COLOR);
 
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-        uploader = new UploaderThread(pnlUploadList);
+        uploader = new UploadManager(pnlUploadList);
 
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));
