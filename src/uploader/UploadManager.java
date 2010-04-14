@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * A thread which manages the upload queue.  It refreshes the UI as uploads
@@ -44,6 +45,7 @@ public class UploadManager extends Thread {
     /** the item currently being uploaded, if any */
     private volatile UploadItem itemBeingUploaded = null;
 
+        assert SwingUtilities.isEventDispatchThread();
     /** constructs a new UploaderThread which will put new UploadItems in p. */
     public UploadManager(final JPanel p, final UploadMechanism uploadMech) {
         pnlUploadItems = p;
@@ -160,6 +162,7 @@ public class UploadManager extends Thread {
      * May ONLY be called from the Swing event dispatch thread (may modify pnlUploadItems).
      */
     public void addFileToUpload(File f) {
+        assert SwingUtilities.isEventDispatchThread();
         if(f.length() <= 0)
             return; // can't upload an empty file
         else if(f.length() > MAX_FILE_SIZE_ALLOWED_MB*1024*1024) {
@@ -189,6 +192,7 @@ public class UploadManager extends Thread {
      * May ONLY be called from the Swing event dispatch thread (may modify pnlUploadItems).
      */
     public void removeItemToUpload(UploadItem item) {
+        assert SwingUtilities.isEventDispatchThread();
         synchronized(this) {
             if(item == itemBeingUploaded)
                 cancelCurrentUpload(null); // try to halt the upload in progress
@@ -221,6 +225,7 @@ public class UploadManager extends Thread {
      * May ONLY be called from the Swing event dispatch thread (may modify pnlUploadItems).
      */
     public void clearCompletedItems() {
+        assert SwingUtilities.isEventDispatchThread();
         synchronized(this) {
             ListIterator<UploadItem> itr = completedList.listIterator();
             while(itr.hasNext()) {
@@ -239,6 +244,7 @@ public class UploadManager extends Thread {
      * May ONLY be called from the Swing event dispatch thread (may modify pnlUploadItems).
      */
     public void retryFailedItems() {
+        assert SwingUtilities.isEventDispatchThread();
         synchronized(this) {
             ListIterator<UploadItem> itr = failedList.listIterator();
             while(itr.hasNext()) {
