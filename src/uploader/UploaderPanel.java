@@ -55,7 +55,7 @@ public class UploaderPanel extends JPanel {
     private final JPanel pnlUploadList = new JPanel();
     private final JLabel txtPending = new JLabel("No photos added yet.");
     private final JLabel txtUploaded = new JLabel("No photos uploaded yet.");
-    private final JButton btnRetryFailed = new JButton("Retry failed uploads", ICON_RETRY);
+    private final JButton btnRetryFailed = new JButton("Retry all 999 failed uploads", ICON_RETRY);
     private final JButton btnClearCompleted = new JButton("Clear completed uploads", ICON_CLEAR);
     private final UploadManager uploader;
     private boolean uploadingEnabled = true;
@@ -169,9 +169,16 @@ public class UploaderPanel extends JPanel {
 
         Util.prepButtonUI(btnRetryFailed, ICON_RETRY_PRESSED, ICON_RETRY_HOVER);
         Util.prepButtonUI(btnClearCompleted, ICON_CLEAR_PRESSED, ICON_CLEAR_HOVER);
-        btnRetryFailed.setMinimumSize(btnClearCompleted.getMinimumSize());
-        btnRetryFailed.setPreferredSize(btnClearCompleted.getPreferredSize());
-        btnRetryFailed.setMaximumSize(btnClearCompleted.getMaximumSize());
+
+        // make each of the buttons the same size
+        Dimension btnSz = new Dimension(Math.max(btnClearCompleted.getMaximumSize().width, btnRetryFailed.getMaximumSize().width),
+                                        Math.max(btnClearCompleted.getMaximumSize().height, btnRetryFailed.getMaximumSize().height));
+        btnClearCompleted.setMinimumSize(btnSz);
+        btnClearCompleted.setPreferredSize(btnSz);
+        btnClearCompleted.setMaximumSize(btnSz);
+        btnRetryFailed.setMinimumSize(btnSz);
+        btnRetryFailed.setPreferredSize(btnSz);
+        btnRetryFailed.setMaximumSize(btnSz);
 
         // hide until clicking them would have some effect
         btnClearCompleted.setVisible(false);
@@ -245,5 +252,18 @@ public class UploaderPanel extends JPanel {
     public void setProgressTexts(String pending, String completed) {
         txtPending.setText(pending);
         txtUploaded.setText(pending);
+    }
+
+    /** sets the number of outstanding failures */
+    public void setNumberFailures(int n) {
+        if(n > 0) {
+            if(n == 1)
+                btnRetryFailed.setText("Retry the failed upload");
+            else
+                btnRetryFailed.setText("Retry all " + n + " failed uploads");
+            btnRetryFailed.setVisible(true);
+        }
+        else
+            btnRetryFailed.setVisible(false);
     }
 }

@@ -159,7 +159,7 @@ public class UploadManager extends Thread {
         if(itemBeingUploaded != null) {
             if(why != null) {
                 failedList.add(itemBeingUploaded);
-                SwingUtilities.invokeLater(new ShowComponent(uploaderUI.getUIRetry()));
+                SwingUtilities.invokeLater(new SetNumFailures(failedList.size()));
                 itemBeingUploaded.setProgressText(why, true);
             }
             itemBeingUploaded.setFailed(true);
@@ -278,7 +278,7 @@ public class UploadManager extends Thread {
         pnlUploadItems.repaint();
     }
 
-    /** a runnable which simply makes the requested component visible when run */
+    /** a runnable which makes the requested component visible when run */
     private class ShowComponent implements Runnable {
         private Component c;
         public ShowComponent(Component c) {
@@ -287,6 +287,17 @@ public class UploadManager extends Thread {
         public void run() {
             assert SwingUtilities.isEventDispatchThread();
             c.setVisible(true);
+        }
+    }
+
+    /** runnable which sets the number of failures on the uploader UI */
+    private class SetNumFailures implements Runnable {
+        private int n;
+        public SetNumFailures(int n) {
+            this.n = n;
+        }
+        public void run() {
+            uploaderUI.setNumberFailures(n);
         }
     }
 }
