@@ -25,7 +25,6 @@ public final class Util {
     public static final void prepButtonUI(JButton b, ImageIcon pressed, ImageIcon hover) {
         b.setPressedIcon(pressed);
         b.setRolloverIcon(hover);
-        b.setOpaque(true);
         b.setFocusPainted(false);
         b.setMargin(new Insets(1,2,1,2));
         b.setForeground(Color.BLUE);

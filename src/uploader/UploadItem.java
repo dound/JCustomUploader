@@ -67,10 +67,17 @@ public class UploadItem extends JPanel {
         add(txtFn);
 
         add(Box.createHorizontalGlue());
+        Dimension lblProgressDim = new Dimension(175, lblSzDim.height);
+        lblProgress.setMinimumSize(lblProgressDim);
+        lblProgress.setPreferredSize(lblProgressDim);
+        lblProgress.setMaximumSize(lblProgressDim);
         add(lblProgress);
         add(Box.createRigidArea(new Dimension(5, 0)));
 
         btnRemove = new JButton(ICON_CLOSE);
+        btnRemove.setContentAreaFilled(false);
+        btnRemove.setBorderPainted(false);
+        btnRemove.setOpaque(false);
         Util.prepButtonUI(btnRemove, ICON_CLOSE_PRESSED, ICON_CLOSE_HOVER);
         btnRemove.setToolTipText("Don't upload this photo");
         Dimension btnRmSz = new Dimension(17, 22);
