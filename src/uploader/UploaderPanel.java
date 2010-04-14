@@ -2,6 +2,7 @@ package uploader;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,7 +66,7 @@ public class UploaderPanel extends JPanel {
         this.setBackground(BG_COLOR);
 
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-        uploader = new UploadManager(pnlUploadList, new SmugMugUploadMechanism());
+        uploader = new UploadManager(this, new TestUploadMechanism(250, 0.25, 0.10));
 
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));
@@ -223,5 +224,26 @@ public class UploaderPanel extends JPanel {
         pnlFB.add(btnClearCompleted);
         pnlFB.add(Box.createRigidArea(new Dimension(1, btnClearCompleted.getMaximumSize().height)));
         return pnlFB;
+    }
+
+    /** returns the component which can clear completed items */
+    public Component getUIClear() {
+        return btnClearCompleted;
+    }
+
+    /** returns the component which can put failed items back in the upload queue */
+    public Component getUIRetry() {
+        return btnRetryFailed;
+    }
+
+    /** returns the container which holds upload items */
+    public Container getUploadItemsContainer() {
+        return pnlUploadList;
+    }
+
+    /** sets the UI components which show pending and completed upload info */
+    public void setProgressTexts(String pending, String completed) {
+        txtPending.setText(pending);
+        txtUploaded.setText(pending);
     }
 }
