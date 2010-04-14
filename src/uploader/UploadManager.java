@@ -3,6 +3,7 @@ package uploader;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 import javax.swing.JOptionPane;
@@ -34,6 +35,8 @@ public class UploadManager extends Thread {
 
     /** list of items to upload */
     private final LinkedList<UploadItem> uploadQueue = new LinkedList<UploadItem>();
+    private final LinkedList<UploadItem> failedList = new LinkedList<UploadItem>();
+    private final LinkedList<UploadItem> completedList = new LinkedList<UploadItem>();
 
     /** whether uploading is enabled */
     private volatile boolean uploadingEnabled = true;
@@ -115,6 +118,7 @@ public class UploadManager extends Thread {
             if(uploadMech.isUploadComplete()) {
                 synchronized(this) {
                     item.setNumBytesUploaded(item.length()); // 100% complete
+                    completedList.add(item);
                     itemBeingUploaded = null;
                 }
                 return;
@@ -135,16 +139,26 @@ public class UploadManager extends Thread {
         uploadMech.cancelUpload();
     }
 
-    /** cancels the current upload, if any */
+    /**
+     * Cancels the current upload, if any.  If why is not null, then the item
+     * is added to the failed list.
+     */
     private synchronized void cancelCurrentUpload(String why) {
         if(itemBeingUploaded != null) {
-            itemBeingUploaded.setProgressText(why, true);
+            if(why != null) {
+                failedList.add(itemBeingUploaded);
+                itemBeingUploaded.setProgressText(why, true);
+            }
             itemBeingUploaded.setFailed(true);
             itemBeingUploaded = null;
         }
     }
 
-    /** adds an item to the upload queue */
+    /**
+     * Adds an item to the upload queue.
+     *
+     * May ONLY be called from the Swing event dispatch thread (may modify pnlUploadItems).
+     */
     public void addFileToUpload(File f) {
         if(f.length() <= 0)
             return; // can't upload an empty file
@@ -169,11 +183,15 @@ public class UploadManager extends Thread {
         }
     }
 
-    /** removes an item from the upload queue */
+    /**
+     * Removes an item from the upload queue.
+     *
+     * May ONLY be called from the Swing event dispatch thread (may modify pnlUploadItems).
+     */
     public void removeItemToUpload(UploadItem item) {
         synchronized(this) {
             if(item == itemBeingUploaded)
-                cancelCurrentUpload("canceled by user"); // try to halt the upload in progress
+                cancelCurrentUpload(null); // try to halt the upload in progress
             else {
                 try {
                     uploadQueue.remove(item); // remove it from the upload queue (hasn't started yet)
@@ -195,5 +213,45 @@ public class UploadManager extends Thread {
     public synchronized void setUploadingEnabled(boolean b) {
         this.uploadingEnabled = b;
         notifyAll();
+    }
+
+    /**
+     * Clears completed items.
+     *
+     * May ONLY be called from the Swing event dispatch thread (may modify pnlUploadItems).
+     */
+    public void clearCompletedItems() {
+        synchronized(this) {
+            ListIterator<UploadItem> itr = completedList.listIterator();
+            while(itr.hasNext()) {
+                UploadItem item = itr.next();
+                pnlUploadItems.remove(item);
+                itr.remove();
+            }
+        }
+        pnlUploadItems.validate();
+        pnlUploadItems.repaint();
+    }
+
+    /**
+     * Put failed items back in the upload queue (at the end of the queue).
+     *
+     * May ONLY be called from the Swing event dispatch thread (may modify pnlUploadItems).
+     */
+    public void retryFailedItems() {
+        synchronized(this) {
+            ListIterator<UploadItem> itr = failedList.listIterator();
+            while(itr.hasNext()) {
+                UploadItem item = itr.next();
+                item.setProgressText("will retry this upload", false);
+                item.setFailed(false);
+                item.setNumBytesUploaded(0);
+                itr.remove();
+                uploadQueue.add(item);
+            }
+            notifyAll();
+        }
+        pnlUploadItems.validate();
+        pnlUploadItems.repaint();
     }
 }

@@ -178,13 +178,13 @@ public class UploaderPanel extends JPanel {
 
         btnRetryFailed.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+                uploader.retryFailedItems();
             }
         });
 
         btnClearCompleted.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+                uploader.clearCompletedItems();
             }
         });
 
