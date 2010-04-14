@@ -139,6 +139,7 @@ public class UploadManager extends Thread {
     private synchronized void cancelCurrentUpload(String why) {
         if(itemBeingUploaded != null) {
             itemBeingUploaded.setProgressText(why, true);
+            itemBeingUploaded.setFailed(true);
             itemBeingUploaded = null;
         }
     }

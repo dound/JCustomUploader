@@ -30,6 +30,7 @@ public class UploadItem extends JPanel {
     private final String fn;
     private long szBytes;
     private long numBytesUploaded = 0;
+    private boolean failed = false;
 
     private final JLabel lblProgress = new JLabel("not yet uploaded", JLabel.RIGHT);
     private final JButton btnRemove;
@@ -174,5 +175,16 @@ public class UploadItem extends JPanel {
     /** convenience wrapper for setNumBytesUploaded() */
     public void incrNumBytesUploaded(long bytesUploaded) {
         setNumBytesUploaded(numBytesUploaded + bytesUploaded);
+    }
+
+    /** returns whether this item has failed to upload */
+    public boolean isFailed() {
+        return failed;
+    }
+
+    /** sets whether this upload item is in a failed state or not */
+    public void setFailed(boolean b) {
+        this.failed = b;
+        this.repaint();
     }
 }
