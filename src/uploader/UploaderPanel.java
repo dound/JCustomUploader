@@ -3,7 +3,6 @@ package uploader;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -74,12 +73,7 @@ public class UploaderPanel extends JPanel {
         pnlCmds.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         final JButton btnAddImages = new JButton("Add images", ICON_ADD);
-        btnAddImages.setPressedIcon(ICON_ADD_PRESSED);
-        btnAddImages.setRolloverIcon(ICON_ADD_HOVER);
-        btnAddImages.setMargin(new Insets(2,2,2,10));
-        btnAddImages.setFocusPainted(false);
-        btnAddImages.setContentAreaFilled(false);
-        btnAddImages.setBorderPainted(false);
+        Util.prepButtonUI(btnAddImages, ICON_ADD_PRESSED, ICON_ADD_HOVER);
         pnlCmds.add(btnAddImages);
         btnAddImages.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -99,12 +93,7 @@ public class UploaderPanel extends JPanel {
         pnlCmds.add(Box.createRigidArea(new Dimension(15, 0)));
 
         JButton btnAddFolder = new JButton("Add all images in a folder", ICON_ADD);
-        btnAddFolder.setPressedIcon(ICON_ADD_PRESSED);
-        btnAddFolder.setRolloverIcon(ICON_ADD_HOVER);
-        btnAddFolder.setMargin(new Insets(2,2,2,10));
-        btnAddFolder.setFocusPainted(false);
-        btnAddFolder.setContentAreaFilled(false);
-        btnAddFolder.setBorderPainted(false);
+        Util.prepButtonUI(btnAddFolder, ICON_ADD_PRESSED, ICON_ADD_HOVER);
         pnlCmds.add(btnAddFolder);
         btnAddFolder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -127,12 +116,7 @@ public class UploaderPanel extends JPanel {
         pnlCmds.add(Box.createHorizontalGlue());
 
         final JButton btnToggleUploading = new JButton("Pause uploading", ICON_UPLOAD_PAUSE);
-        btnToggleUploading.setPressedIcon(ICON_UPLOAD_PAUSE_PRESSED);
-        btnToggleUploading.setRolloverIcon(ICON_UPLOAD_PAUSE_HOVER);
-        btnToggleUploading.setOpaque(false);
-        btnToggleUploading.setFocusPainted(false);
-        btnToggleUploading.setContentAreaFilled(false);
-        btnToggleUploading.setBorderPainted(false);
+        Util.prepButtonUI(btnToggleUploading, ICON_UPLOAD_PAUSE_PRESSED, ICON_UPLOAD_PAUSE_HOVER);
         btnToggleUploading.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 uploadingEnabled = !uploadingEnabled;
