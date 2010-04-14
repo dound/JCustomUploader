@@ -1,9 +1,11 @@
 package uploader;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -13,7 +15,16 @@ import javax.swing.JPanel;
  * @author David Underhill
  */
 public class UploadManager extends Thread {
+    private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
     private static final long CHUNK_SIZE = 4096;
+
+    /**
+     * Maximum size file which will be accepted.  Note: This can be bypassed if
+     * the file is changed between when we are asked to upload it and the time
+     * the upload actually starts.
+     */
+    private static final long MAX_FILE_SIZE_ALLOWED_MB = 16;
+
 
     /** UI container which holds UploadItems */
     private final JPanel pnlUploadItems;
@@ -132,6 +143,16 @@ public class UploadManager extends Thread {
     public void addFileToUpload(File f) {
         if(f.length() <= 0)
             return; // can't upload an empty file
+        else if(f.length() > MAX_FILE_SIZE_ALLOWED_MB*1024*1024) {
+            //+.01=>make sure rounded number is still strictly greater than the threshold
+            double sz_MB = f.length()/1024.0/1024.0 + 0.01;
+            JOptionPane.showMessageDialog(null,
+                    "Warning: skipping " + f.getName() + " because it is too big.\n" +
+                    "\n" +
+                    "Size of " + f.getName() + ": " + SZ_FMT.format(sz_MB) + "MB\n" +
+                    "Max Size Allowed: " + SZ_FMT.format(MAX_FILE_SIZE_ALLOWED_MB) + "MB\n");
+            return;
+        }
 
         UploadItem item = new UploadItem(this, f.getPath(), f.length());
         pnlUploadItems.add(item);
