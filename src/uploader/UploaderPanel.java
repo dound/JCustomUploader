@@ -12,7 +12,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,6 +25,12 @@ public class UploaderPanel extends JPanel {
     private static final ImageIcon ICON_ADD = Util.createImageIcon("/resources/add.png");
     private static final ImageIcon ICON_ADD_PRESSED = Util.createImageIcon("/resources/add-press.png");
     private static final ImageIcon ICON_ADD_HOVER = Util.createImageIcon("/resources/add-hover.png");
+    private static final ImageIcon ICON_UPLOAD_PAUSE = Util.createImageIcon("/resources/upload-pause.png");
+    private static final ImageIcon ICON_UPLOAD_PAUSE_PRESSED = Util.createImageIcon("/resources/upload-pause-press.png");
+    private static final ImageIcon ICON_UPLOAD_PAUSE_HOVER = Util.createImageIcon("/resources/upload-pause-hover.png");
+    private static final ImageIcon ICON_UPLOAD_RESUME = Util.createImageIcon("/resources/upload-resume.png");
+    private static final ImageIcon ICON_UPLOAD_RESUME_PRESSED = Util.createImageIcon("/resources/upload-resume-press.png");
+    private static final ImageIcon ICON_UPLOAD_RESUME_HOVER = Util.createImageIcon("/resources/upload-resume-hover.png");
 
     private static final JFileChooser FC;
     private static final ImageFileFilter FILTER_IMAGES = new ImageFileFilter();
@@ -44,6 +49,7 @@ public class UploaderPanel extends JPanel {
     private final JLabel txtPending = new JLabel("No photos added yet.");
     private final JLabel txtUploaded = new JLabel("No photos uploaded yet.");
     private final UploadManager uploader;
+    private boolean uploadingEnabled = true;
 
     public UploaderPanel() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -119,51 +125,35 @@ public class UploaderPanel extends JPanel {
         });
 
         pnlCmds.add(Box.createHorizontalGlue());
-        pnlCmds.add(create_upload_panel());
+
+        final JButton btnToggleUploading = new JButton("Pause uploading", ICON_UPLOAD_PAUSE);
+        btnToggleUploading.setPressedIcon(ICON_UPLOAD_PAUSE_PRESSED);
+        btnToggleUploading.setRolloverIcon(ICON_UPLOAD_PAUSE_HOVER);
+        btnToggleUploading.setOpaque(false);
+        btnToggleUploading.setFocusPainted(false);
+        btnToggleUploading.setContentAreaFilled(false);
+        btnToggleUploading.setBorderPainted(false);
+        btnToggleUploading.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                uploadingEnabled = !uploadingEnabled;
+                uploader.setUploadingEnabled(uploadingEnabled);
+                if(uploadingEnabled) {
+                    btnToggleUploading.setText("Pause uploading");
+                    btnToggleUploading.setIcon(ICON_UPLOAD_PAUSE);
+                    btnToggleUploading.setPressedIcon(ICON_UPLOAD_PAUSE_PRESSED);
+                    btnToggleUploading.setRolloverIcon(ICON_UPLOAD_PAUSE_HOVER);
+                }
+                else {
+                    btnToggleUploading.setText("Resume uploading");
+                    btnToggleUploading.setIcon(ICON_UPLOAD_RESUME);
+                    btnToggleUploading.setPressedIcon(ICON_UPLOAD_RESUME_PRESSED);
+                    btnToggleUploading.setRolloverIcon(ICON_UPLOAD_RESUME_HOVER);
+                }
+            }
+        });
+        pnlCmds.add(btnToggleUploading);
+
         return pnlCmds;
-    }
-
-    private JPanel create_upload_panel() {
-        final JPanel pnlUpload = new JPanel();
-        pnlUpload.setLayout(new BoxLayout(pnlUpload, BoxLayout.X_AXIS));
-        pnlUpload.setOpaque(false);
-        pnlUpload.setAlignmentX(Component.RIGHT_ALIGNMENT);
-
-        final JCheckBox chkUploading = new JCheckBox("Upload photos as I add them", true);
-        final JButton btnUploadNow = new JButton("Start Uploading Now");
-        pnlUpload.add(Box.createHorizontalGlue());
-        pnlUpload.add(chkUploading);
-        pnlUpload.add(btnUploadNow);
-
-        chkUploading.setOpaque(false);
-        chkUploading.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                chkUploading.setVisible(false);
-                btnUploadNow.setVisible(true);
-                uploader.setUploadingEnabled(false);
-            }
-        });
-
-        btnUploadNow.setVisible(false);
-        btnUploadNow.setOpaque(false);
-        btnUploadNow.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                btnUploadNow.setVisible(false);
-                chkUploading.setVisible(true);
-                chkUploading.setSelected(true);
-                uploader.setUploadingEnabled(true);
-            }
-        });
-
-        // reserve the space needed for the larger of the two components so that
-        // when we switch between them the layout doesn't shift any
-        int maxWidth = Math.max(chkUploading.getMaximumSize().width, btnUploadNow.getMaximumSize().width);
-        int maxHeight = Math.max(chkUploading.getMaximumSize().height, btnUploadNow.getMaximumSize().height) + 1;
-        Dimension sz = new Dimension(maxWidth, maxHeight);
-        pnlUpload.setMinimumSize(sz);
-        pnlUpload.setPreferredSize(sz);
-        pnlUpload.setMaximumSize(sz);
-        return pnlUpload;
     }
 
     private JScrollPane create_upload_list() {
