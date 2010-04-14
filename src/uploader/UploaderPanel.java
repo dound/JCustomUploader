@@ -209,7 +209,7 @@ public class UploaderPanel extends JPanel {
         pnlFT.add(txtPending);
         pnlFT.add(Box.createHorizontalGlue());
         pnlFT.add(btnRetryFailed);
-        pnlFT.add(Box.createRigidArea(new Dimension(1, 0)));
+        pnlFT.add(Box.createRigidArea(new Dimension(1, btnRetryFailed.getMaximumSize().height)));
         return pnlFT;
     }
 
@@ -221,7 +221,7 @@ public class UploaderPanel extends JPanel {
         pnlFB.add(txtUploaded);
         pnlFB.add(Box.createHorizontalGlue());
         pnlFB.add(btnClearCompleted);
-        pnlFB.add(Box.createRigidArea(new Dimension(1, 0)));
+        pnlFB.add(Box.createRigidArea(new Dimension(1, btnClearCompleted.getMaximumSize().height)));
         return pnlFB;
     }
 }
