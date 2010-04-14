@@ -118,7 +118,8 @@ public class UploadItem extends JPanel {
         lblProgress.setText(s);
         if(showAlert) {
             lblProgress.setIcon(ICON_ALERT);
-            lblProgress.setForeground(Color.RED);
+            lblProgress.setForeground(DARK_RED);
+            lblProgress.setToolTipText(s);
         }
         else {
             lblProgress.setIcon(null);
