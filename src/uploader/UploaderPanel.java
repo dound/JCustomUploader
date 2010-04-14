@@ -25,6 +25,7 @@ public class UploaderPanel extends JPanel {
     public static final Color BG_COLOR = Color.WHITE;
     private static final ImageIcon ICON_ADD = Util.createImageIcon("/resources/add.png");
     private static final ImageIcon ICON_ADD_PRESSED = Util.createImageIcon("/resources/add-press.png");
+    private static final ImageIcon ICON_ADD_HOVER = Util.createImageIcon("/resources/add-hover.png");
 
     private static final JFileChooser FC;
     private static final ImageFileFilter FILTER_IMAGES = new ImageFileFilter();
@@ -68,8 +69,11 @@ public class UploaderPanel extends JPanel {
 
         final JButton btnAddImages = new JButton("Add images", ICON_ADD);
         btnAddImages.setPressedIcon(ICON_ADD_PRESSED);
+        btnAddImages.setRolloverIcon(ICON_ADD_HOVER);
         btnAddImages.setMargin(new Insets(2,2,2,10));
         btnAddImages.setFocusPainted(false);
+        btnAddImages.setContentAreaFilled(false);
+        btnAddImages.setBorderPainted(false);
         pnlCmds.add(btnAddImages);
         btnAddImages.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -90,8 +94,11 @@ public class UploaderPanel extends JPanel {
 
         JButton btnAddFolder = new JButton("Add all images in a folder", ICON_ADD);
         btnAddFolder.setPressedIcon(ICON_ADD_PRESSED);
+        btnAddFolder.setRolloverIcon(ICON_ADD_HOVER);
         btnAddFolder.setMargin(new Insets(2,2,2,10));
         btnAddFolder.setFocusPainted(false);
+        btnAddFolder.setContentAreaFilled(false);
+        btnAddFolder.setBorderPainted(false);
         pnlCmds.add(btnAddFolder);
         btnAddFolder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
