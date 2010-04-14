@@ -19,7 +19,9 @@ public interface UploadMechanism {
     public boolean startUpload(String fn);
 
     /**
-     * Called until this method returns false or isUploadComplete() returns true.
+     * Called until this method returns false or isUploadComplete() returns
+     * true.  Should not be called if startUpload() has not yet been called or
+     * if isUploadComplete() returns true.
      *
      * @param num_bytes_to_upload  the max number of bytes to upload with this chunk
      *

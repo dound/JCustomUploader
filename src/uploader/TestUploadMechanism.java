@@ -99,11 +99,16 @@ public class TestUploadMechanism implements UploadMechanism {
         }
         else {
             long max = sz - offset;
-            offset += max;
-            if(max > 0) {
+            long actualNumBytesToUpload = Math.min(max, numBytesToUpload);
+            offset += actualNumBytesToUpload;
+            if(actualNumBytesToUpload > 0) {
                 try { Thread.sleep(this.chunkXferTime_ms); } catch(InterruptedException e) {}
             }
-            return Math.min(max, numBytesToUpload);
+            if(this.isUploadComplete()) {
+                this.currentUpload = null;
+                err = "upload successful (no error)";
+            }
+            return actualNumBytesToUpload;
         }
     }
 
