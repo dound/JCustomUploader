@@ -120,9 +120,13 @@ public class UploadManager extends Thread {
                 return;
             }
 
-            // get the latest value of itemBeingUploaded (it will change to null
-            // if the upload should be stopped)
+            // Pause the upload if uploading is disabled.  Also, get the latest
+            // value of itemBeingUploaded (it will change to null if the upload
+            // of the current item has been canceled).
             synchronized(this) {
+                while(!uploadingEnabled) {
+                    try { wait(); } catch(InterruptedException e) {}
+                }
                 item = itemBeingUploaded;
             }
         }

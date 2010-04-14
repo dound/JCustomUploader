@@ -133,6 +133,7 @@ public class UploaderPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 chkUploading.setVisible(false);
                 btnUploadNow.setVisible(true);
+                uploader.setUploadingEnabled(false);
             }
         });
 
@@ -143,6 +144,7 @@ public class UploaderPanel extends JPanel {
                 btnUploadNow.setVisible(false);
                 chkUploading.setVisible(true);
                 chkUploading.setSelected(true);
+                uploader.setUploadingEnabled(true);
             }
         });
 
