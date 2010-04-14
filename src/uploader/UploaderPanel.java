@@ -15,6 +15,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
@@ -30,6 +31,12 @@ public class UploaderPanel extends JPanel {
     private static final ImageIcon ICON_UPLOAD_RESUME = Util.createImageIcon("/resources/upload-resume.png");
     private static final ImageIcon ICON_UPLOAD_RESUME_PRESSED = Util.createImageIcon("/resources/upload-resume-press.png");
     private static final ImageIcon ICON_UPLOAD_RESUME_HOVER = Util.createImageIcon("/resources/upload-resume-hover.png");
+    private static final ImageIcon ICON_CLEAR = Util.createImageIcon("/resources/clear.png");
+    private static final ImageIcon ICON_CLEAR_PRESSED = Util.createImageIcon("/resources/clear-press.png");
+    private static final ImageIcon ICON_CLEAR_HOVER = Util.createImageIcon("/resources/clear-hover.png");
+    private static final ImageIcon ICON_RETRY = Util.createImageIcon("/resources/retry.png");
+    private static final ImageIcon ICON_RETRY_PRESSED = Util.createImageIcon("/resources/retry-press.png");
+    private static final ImageIcon ICON_RETRY_HOVER = Util.createImageIcon("/resources/retry-hover.png");
 
     private static final JFileChooser FC;
     private static final ImageFileFilter FILTER_IMAGES = new ImageFileFilter();
@@ -47,6 +54,8 @@ public class UploaderPanel extends JPanel {
     private final JPanel pnlUploadList = new JPanel();
     private final JLabel txtPending = new JLabel("No photos added yet.");
     private final JLabel txtUploaded = new JLabel("No photos uploaded yet.");
+    private final JButton btnRetryFailed = new JButton("Retry failed uploads", ICON_RETRY);
+    private final JButton btnClearCompleted = new JButton("Clear completed uploads", ICON_CLEAR);
     private final UploadManager uploader;
     private boolean uploadingEnabled = true;
 
@@ -136,6 +145,7 @@ public class UploaderPanel extends JPanel {
             }
         });
         pnlCmds.add(btnToggleUploading);
+        pnlCmds.add(Box.createRigidArea(new Dimension(1, 0)));
 
         return pnlCmds;
     }
@@ -148,19 +158,70 @@ public class UploaderPanel extends JPanel {
         JScrollPane spUploadList = new JScrollPane(pnlUploadList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         spUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
         return spUploadList;
-   }
+    }
 
-   private JPanel create_footer_panel() {
+    private JPanel create_footer_panel() {
         JPanel pnlFooter = new JPanel();
         pnlFooter.setOpaque(false);
         pnlFooter.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         pnlFooter.setLayout(new BoxLayout(pnlFooter, BoxLayout.Y_AXIS));
+
+        Util.prepButtonUI(btnRetryFailed, ICON_RETRY_PRESSED, ICON_RETRY_HOVER);
+        Util.prepButtonUI(btnClearCompleted, ICON_CLEAR_PRESSED, ICON_CLEAR_HOVER);
+        btnRetryFailed.setMinimumSize(btnClearCompleted.getMinimumSize());
+        btnRetryFailed.setPreferredSize(btnClearCompleted.getPreferredSize());
+        btnRetryFailed.setMaximumSize(btnClearCompleted.getMaximumSize());
+
+        // hide until clicking them would have some effect
+        btnClearCompleted.setVisible(false);
+        btnRetryFailed.setVisible(false);
+
+        btnRetryFailed.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        btnClearCompleted.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        txtPending.setVerticalAlignment(SwingConstants.CENTER);
+        txtUploaded.setVerticalAlignment(SwingConstants.CENTER);
+        txtPending.setAlignmentY(Component.CENTER_ALIGNMENT);
+        txtUploaded.setAlignmentY(Component.CENTER_ALIGNMENT);
+
         pnlFooter.add(Box.createRigidArea(new Dimension(0, 5)));
-        pnlFooter.add(txtPending);
+        pnlFooter.add(create_footer_panel_top());
         pnlFooter.add(Box.createRigidArea(new Dimension(0, 5)));
-        pnlFooter.add(txtUploaded);
+        pnlFooter.add(create_footer_panel_btm());
 
         return pnlFooter;
+    }
+
+    private JPanel create_footer_panel_top() {
+        JPanel pnlFT = new JPanel();
+        pnlFT.setOpaque(false);
+        pnlFT.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlFT.setLayout(new BoxLayout(pnlFT, BoxLayout.X_AXIS));
+        pnlFT.add(txtPending);
+        pnlFT.add(Box.createHorizontalGlue());
+        pnlFT.add(btnRetryFailed);
+        pnlFT.add(Box.createRigidArea(new Dimension(1, 0)));
+        return pnlFT;
+    }
+
+    private JPanel create_footer_panel_btm() {
+        JPanel pnlFB = new JPanel();
+        pnlFB.setOpaque(false);
+        pnlFB.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlFB.setLayout(new BoxLayout(pnlFB, BoxLayout.X_AXIS));
+        pnlFB.add(txtUploaded);
+        pnlFB.add(Box.createHorizontalGlue());
+        pnlFB.add(btnClearCompleted);
+        pnlFB.add(Box.createRigidArea(new Dimension(1, 0)));
+        return pnlFB;
     }
 }
