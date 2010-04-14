@@ -18,7 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class UploadItem extends JPanel {
-    private static final Color COLOR_UPLOAD_PROGRESS = new Color(196, 255, 196);
+    private static final Color COLOR_UPLOAD_FAILED = new Color(255, 196, 196);
+    private static final Color COLOR_UPLOAD_PROGRESS = new Color(196, 255, 255);
+    private static final Color COLOR_UPLOAD_COMPLETE = new Color(196, 255, 196);
+    private static final Color DARK_RED = new Color(64, 0, 0);
     private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
     private static final ImageIcon ICON_CLOSE = Util.createImageIcon("/resources/close.png");
     private static final ImageIcon ICON_CLOSE_PRESSED = Util.createImageIcon("/resources/close-press.png");
@@ -134,7 +137,14 @@ public class UploadItem extends JPanel {
         Color c = g2d.getColor();
 
         int perDoneX = (int)(getWidth() * getPercentUploaded());
-        g2d.setColor(COLOR_UPLOAD_PROGRESS);
+        if(isUploaded())
+            g2d.setColor(COLOR_UPLOAD_COMPLETE);
+        else if(isFailed()) {
+            g2d.setColor(COLOR_UPLOAD_FAILED);
+            perDoneX = getWidth();
+        }
+        else
+            g2d.setColor(COLOR_UPLOAD_PROGRESS);
         g2d.fillRect(0, 0, perDoneX, getHeight());
 
         g2d.setColor(UploaderPanel.BG_COLOR);
