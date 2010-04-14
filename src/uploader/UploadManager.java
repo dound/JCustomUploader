@@ -1,5 +1,6 @@
 package uploader;
 
+import java.awt.Component;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
@@ -31,6 +32,9 @@ public class UploadManager extends Thread {
     /** UI container which holds UploadItems */
     private final JPanel pnlUploadItems;
 
+    /** UI element to show when clear/retry actions are available */
+    private final Component uiClear, uiRetry;
+
     /** the object which will actually uploads each file */
     final UploadMechanism uploadMech;
 
@@ -45,10 +49,21 @@ public class UploadManager extends Thread {
     /** the item currently being uploaded, if any */
     private volatile UploadItem itemBeingUploaded = null;
 
+    /**
+     * Constructs a new UploadManager which will manage uploads using the
+     * specified upload mechanism.  It will provide callbacks on the Swing event
+     * dispatch thread when uiClear and uiRetry should be shown.  It also
+     * provides methods which can modify p to show the list of items being
+     * uploaded, but these methods are not referenced by this thread - they may
+     * only be called from the event dispatch thread.  This constructor may only
+     * be called from the event dispatch thread too.
+     */
+    public UploadManager(final JPanel p, final Component uiClear, final Component uiRetry,
+                         final UploadMechanism uploadMech) {
         assert SwingUtilities.isEventDispatchThread();
-    /** constructs a new UploaderThread which will put new UploadItems in p. */
-    public UploadManager(final JPanel p, final UploadMechanism uploadMech) {
         pnlUploadItems = p;
+        this.uiClear = uiClear;
+        this.uiRetry = uiRetry;
         this.uploadMech = uploadMech;
     }
 
@@ -121,6 +136,7 @@ public class UploadManager extends Thread {
                 synchronized(this) {
                     item.setNumBytesUploaded(item.length()); // 100% complete
                     completedList.add(item);
+                    SwingUtilities.invokeLater(new ShowComponent(uiClear));
                     itemBeingUploaded = null;
                 }
                 return;
@@ -149,6 +165,7 @@ public class UploadManager extends Thread {
         if(itemBeingUploaded != null) {
             if(why != null) {
                 failedList.add(itemBeingUploaded);
+                SwingUtilities.invokeLater(new ShowComponent(uiRetry));
                 itemBeingUploaded.setProgressText(why, true);
             }
             itemBeingUploaded.setFailed(true);
@@ -233,6 +250,7 @@ public class UploadManager extends Thread {
                 pnlUploadItems.remove(item);
                 itr.remove();
             }
+            uiClear.setVisible(false);
         }
         pnlUploadItems.validate();
         pnlUploadItems.repaint();
@@ -255,9 +273,22 @@ public class UploadManager extends Thread {
                 itr.remove();
                 uploadQueue.add(item);
             }
+            uiRetry.setVisible(false);
             notifyAll();
         }
         pnlUploadItems.validate();
         pnlUploadItems.repaint();
+    }
+
+    /** a runnable which simply makes the requested component visible when run */
+    private class ShowComponent implements Runnable {
+        private Component c;
+        public ShowComponent(Component c) {
+            this.c = c;
+        }
+        public void run() {
+            assert SwingUtilities.isEventDispatchThread();
+            c.setVisible(true);
+        }
     }
 }
