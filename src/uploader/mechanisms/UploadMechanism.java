@@ -1,4 +1,4 @@
-package uploader;
+package uploader.mechanisms;
 
 /**
  * Defines methods for uploading a file.  A file upload must start by calling

@@ -21,6 +21,9 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
+import uploader.mechanisms.TestUploadMechanism;
+import uploader.mechanisms.UploadMechanism;
+
 public class UploaderPanel extends JPanel {
     private static final int MARGIN_SIZE = 5;
     public static final Color BG_COLOR = Color.WHITE;

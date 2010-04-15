@@ -1,4 +1,5 @@
-package uploader;
+package uploader.mechanisms;
+
 
 /**
  * Uploads files to SmugMug.

@@ -11,6 +11,8 @@ import java.util.NoSuchElementException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import uploader.mechanisms.UploadMechanism;
+
 /**
  * An which manages the upload queue and the thread(s) which service that queue.
  * It refreshes the UI as uploads progress and handles requests to upload new

@@ -1,7 +1,8 @@
-package uploader;
+package uploader.mechanisms;
 
 import java.io.File;
 import java.util.Random;
+
 
 /**
  * Pretends to upload files.  Intended to help test code which uses
