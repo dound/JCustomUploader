@@ -23,6 +23,8 @@ import javax.swing.filechooser.FileFilter;
 
 import uploader.mechanisms.TestUploadMechanism;
 import uploader.mechanisms.UploadMechanism;
+import uploader.util.ImagePreview;
+import uploader.util.Util;
 
 public class UploaderPanel extends JPanel {
     private static final int MARGIN_SIZE = 5;

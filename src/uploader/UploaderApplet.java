@@ -3,6 +3,8 @@ package uploader;
 import javax.swing.JApplet;
 import javax.swing.SwingUtilities;
 
+import uploader.util.ImageFileFilter;
+
 /**
  * Boilerplate applet shell.
  *

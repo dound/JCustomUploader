@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import uploader.util.Util;
+
 /**
  * The UI for an item being uploaded.  This includes information about the
  * current state of the upload (e.g., number of bytes uploaded).  This object

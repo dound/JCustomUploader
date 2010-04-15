@@ -1,4 +1,4 @@
-package uploader;
+package uploader.util;
 
 import java.io.File;
 
