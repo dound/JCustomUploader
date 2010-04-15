@@ -280,7 +280,7 @@ public class UploadManager extends Thread {
 
     /** a runnable which makes the requested component visible when run */
     private class ShowComponent implements Runnable {
-        private Component c;
+        private final Component c;
         public ShowComponent(Component c) {
             this.c = c;
         }
@@ -292,7 +292,7 @@ public class UploadManager extends Thread {
 
     /** runnable which sets the number of failures on the uploader UI */
     private class SetNumFailures implements Runnable {
-        private int n;
+        private final int n;
         public SetNumFailures(int n) {
             this.n = n;
         }
