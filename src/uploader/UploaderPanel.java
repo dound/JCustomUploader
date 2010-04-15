@@ -46,22 +46,23 @@ public class UploaderPanel extends JPanel {
     private final ImagePreview previewAccessory;
 
     private final JPanel pnlUploadList = new JPanel();
-    private final JLabel txtPending = new JLabel();
-    private final JLabel txtUploaded = new JLabel();
+    private final JLabel txtPending = new JLabel(" ");
+    private final JLabel txtUploaded = new JLabel(" ");
     private final JButton btnRetryFailed = new JButton("Retry all 999 failed uploads", ICON_RETRY);
     private final JButton btnClearCompleted = new JButton("Clear completed uploads", ICON_CLEAR);
     private final UploadManager uploader;
     private boolean uploadingEnabled = true;
 
     public UploaderPanel(int width) {
-        this(width, null, true);
+        this(width, "item", null, true);
     }
-
-    public UploaderPanel(int width, FileFilter filter) {
-        this(width, filter, true);
+    public UploaderPanel(int width, String itemType) {
+        this(width, itemType, null, true);
     }
-
-    public UploaderPanel(int width, FileFilter filter, boolean useImagePreviewAccessory) {
+    public UploaderPanel(int width, String itemType, FileFilter filter) {
+        this(width, itemType, filter, true);
+    }
+    public UploaderPanel(int width, String itemType, FileFilter filter, boolean useImagePreviewAccessory) {
         // annoying ui fix: don't let users edit filenames because JFileChooser
         // has trouble distinguishing between double-clicking to open a folder
         // or rename it (yuck)
@@ -82,7 +83,7 @@ public class UploaderPanel extends JPanel {
         final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
         for(int i=0; i<NUM_THREADS; i++)
             uploadMechs[i] = new TestUploadMechanism(250, 0.2, 0.03, System.currentTimeMillis()+i*100);
-        uploader = new UploadManager(this, uploadMechs);
+        uploader = new UploadManager(this, itemType, uploadMechs);
 
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));

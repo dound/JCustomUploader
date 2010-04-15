@@ -11,7 +11,6 @@ import javax.swing.SwingUtilities;
 public class UploaderApplet extends JApplet {
     //Called when this applet is loaded into the browser.
     public void init() {
-        //Execute a job on the event-dispatching thread; creating this applet's GUI.
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
@@ -24,8 +23,7 @@ public class UploaderApplet extends JApplet {
     }
 
     private void createGUI() {
-        //Create and set up the content pane.
-        UploaderPanel newContentPane = new UploaderPanel(getWidth(), new ImageFileFilter(), true);
+        UploaderPanel newContentPane = new UploaderPanel(getWidth(), "photo", new ImageFileFilter(), true);
         newContentPane.setOpaque(true);
         setContentPane(newContentPane);
     }

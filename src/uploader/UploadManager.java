@@ -26,9 +26,6 @@ public class UploadManager {
     private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
     private static final long CHUNK_SIZE = 4096;
 
-    /** the name of the items in the queue (a generic name might be 'item') */
-    private static final String ITEM_NAME = "photo";
-
     /** weight of the previous upload rate when computing a new upload rate */
     private static final double ALPHA = 0.5;
 
@@ -39,6 +36,8 @@ public class UploadManager {
      */
     private static final long MAX_FILE_SIZE_ALLOWED_MB = 16;
 
+    /** the name of the items in the queue (a generic name might be 'item') */
+    private final String itemType;
 
     /** UI for this upload manager */
     private final UploaderPanel uploaderUI;
@@ -222,16 +221,16 @@ public class UploadManager {
 
     /**
      * Constructs a new UploadManager which will manage uploads using the
-     * specified upload mechanism.  It will provide callbacks on the Swing event
-     * dispatch thread when UI elements need updating.  It also
-     * provides methods which can modify p to show the list of items being
-     * uploaded, but these methods are not referenced by this thread - they may
-     * only be called from the event dispatch thread.  This constructor may only
-     * be called from the event dispatch thread too.
+     * specified upload mechanisms.
+     *
+     * @param uploaderUI    the UI this manager works for
+     * @param itemType      text describing what kind of items are being uploaded
+     * @param uploadsMechs  how to upload files (one per thread we should use)
      */
-    public UploadManager(final UploaderPanel uploaderUI, final UploadMechanism[] uploadMechs) {
+    public UploadManager(final UploaderPanel uploaderUI, String itemType, final UploadMechanism[] uploadMechs) {
         assert SwingUtilities.isEventDispatchThread();
         this.uploaderUI = uploaderUI;
+        this.itemType = itemType;
 
         uploaderThreads = new UploaderThread[uploadMechs.length];
         for(int i=0; i<uploadMechs.length; i++)
@@ -429,7 +428,7 @@ public class UploadManager {
             pending = "Nothing to upload yet.";
         else {
             String megabytesLeft = SZ_FMT.format(numBytesLeftToUploadCopy / 1024.0 / 1024.0 + 0.01); // never show 0.00
-            pending = itemsLeft + pl(" "+ITEM_NAME,itemsLeft) + " left to upload (" + megabytesLeft + " MB).  ";
+            pending = itemsLeft + pl(" "+itemType,itemsLeft) + " left to upload (" + megabytesLeft + " MB).  ";
 
             // append the estimated time remaining (round up to the nearest minute if displaying minutes)
             if(!uploadingEnabled)
@@ -452,14 +451,14 @@ public class UploadManager {
 
         String completed;
         if(numItemsUploadedCopy == 0)
-            completed = "No " + ITEM_NAME + "s uploaded yet.";
+            completed = "No " + itemType + "s uploaded yet.";
         else if(numItemsUploadedCopy == 1)
-            completed = "1 " + ITEM_NAME + " has been uploaded.";
+            completed = "1 " + itemType + " has been uploaded.";
         else
-            completed = numItemsUploadedCopy + " " + ITEM_NAME + "s have been uploaded.";
+            completed = numItemsUploadedCopy + " " + itemType + "s have been uploaded.";
 
         if(itemsFailed > 0)
-            completed += "  " + itemsFailed + pl(" "+ITEM_NAME,itemsFailed) + " failed to upload.";
+            completed += "  " + itemsFailed + pl(" "+itemType,itemsFailed) + " failed to upload.";
 
         setProgressTexts(pending, completed);
     }
