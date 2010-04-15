@@ -137,21 +137,21 @@ public class UploadManager extends Thread {
         // loop until the upload is canceled or done
         long prevTime = System.currentTimeMillis(), now;
         double curRate_Bps = 0;
-        long bytes_uploaded = 0;
+        long bytesUploaded = 0;
         long totalBytesUploaded = 0;
         while(item!=null) {
             // upload the next chunk of this item
-            bytes_uploaded = uploadMech.uploadNextChunk(CHUNK_SIZE);
-            if(bytes_uploaded == -1L) {
+            bytesUploaded = uploadMech.uploadNextChunk(CHUNK_SIZE);
+            if(bytesUploaded == -1L) {
                 cancelCurrentUpload(uploadMech.getErrorText());
                 return;
             }
             else {
-                totalBytesUploaded += bytes_uploaded;
+                totalBytesUploaded += bytesUploaded;
                 item.setNumBytesUploaded(totalBytesUploaded);
-                incrNumBytesLeftToUpload(-bytes_uploaded);
+                incrNumBytesLeftToUpload(-bytesUploaded);
                 now = System.currentTimeMillis();
-                curRate_Bps = (1000.0*bytes_uploaded) / (now - prevTime);
+                curRate_Bps = (1000.0*bytesUploaded) / (now - prevTime);
                 prevTime = now;
                 recentUploadRate_Bps = (recentUploadRate_Bps*ALPHA) + (1.0-ALPHA)*curRate_Bps;
                 updateProgressTexts();
@@ -184,8 +184,8 @@ public class UploadManager extends Thread {
         // counter.  We also counted the last chunk sent before we realized the
         // item had been cancelled, so go ahead and add those bytes back so we
         // don't double-count them.
-        if(bytes_uploaded > 0)
-            this.incrNumBytesLeftToUpload(bytes_uploaded);
+        if(bytesUploaded > 0)
+            this.incrNumBytesLeftToUpload(bytesUploaded);
 
         // the item's upload has been canceled, but we've partially uploaded it
         uploadMech.cancelUpload();
