@@ -16,7 +16,16 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
+/**
+ * The UI for an item being uploaded.  This includes information about the
+ * current state of the upload (e.g., number of bytes uploaded).  This object
+ * is thread-safe except for methods which explicitly indicate threading
+ * restrictions.
+ *
+ * @author David Underhill
+ */
 public class UploadItem extends JPanel {
     private static final Color COLOR_UPLOAD_FAILED = new Color(255, 196, 196);
     private static final Color COLOR_UPLOAD_PROGRESS = new Color(196, 255, 255);
@@ -31,9 +40,9 @@ public class UploadItem extends JPanel {
 
     private final UploadManager uploader;
     private final String fn;
-    private long szBytes;
-    private long numBytesUploaded = 0;
-    private boolean failed = false;
+    private volatile long szBytes;
+    private volatile long numBytesUploaded = 0;
+    private volatile boolean failed = false;
 
     private final JLabel lblProgress = new JLabel("not yet uploaded", JLabel.RIGHT);
     private final JButton btnRemove;
@@ -87,34 +96,59 @@ public class UploadItem extends JPanel {
         add(Box.createRigidArea(new Dimension(5, 0)));
     }
 
-    /** returns the size of the file */
+    /**
+     * Returns the size of the file.
+     *
+     * Thread-safe (volatile variable).
+     */
     public long length() {
         return szBytes;
     }
 
-    /** sets the size of the file (use this if the size has changed) */
+    /**
+     * Sets the size of the file (use this if the size has changed).
+     *
+     * Thread-safe (volatile variable and Swing thread-safe method).
+     */
     public void setItemSize(long sizeOfCurrentUpload) {
         szBytes = sizeOfCurrentUpload;
-        this.repaint();
+        this.repaint(); // thread-safe
     }
 
-    /** returns the filename of this item */
+    /**
+     * Returns the filename of this item.
+     *
+     * Thread-safe (final variable).
+     */
     public String getFilename() {
         return fn;
     }
 
-    /** returns the percentage of this item which has been uploaded [0.0,1.0] */
+    /**
+     * Returns the percentage of this item which has been uploaded [0.0,1.0].
+     *
+     * Thread-safe (volatile variables).
+     */
     public double getPercentUploaded() {
         return numBytesUploaded / (double)szBytes;
     }
 
-    /** returns the text associated with the progress label */
-    public String getProgressText() {
-        return lblProgress.getText();
+    /**
+     * Sets the text associated with the progress label.
+     *
+     * Thread-safe (asynchronously updates UI from Swing EDT).
+     */
+    public void setProgressText(final String s, final boolean showAlert) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setProgressTextDirectly(s, showAlert);
+            }
+        });
     }
 
-    /** sets the text associated with the progress label */
-    public void setProgressText(String s, boolean showAlert) {
+    /** Updates the progress text.  MUST be called from the Swing EDT. */
+    private void setProgressTextDirectly(String s, boolean showAlert) {
+        assert SwingUtilities.isEventDispatchThread();
         lblProgress.setText(s);
         if(showAlert) {
             lblProgress.setIcon(ICON_ALERT);
@@ -127,13 +161,22 @@ public class UploadItem extends JPanel {
         }
     }
 
-    /** returns true if the item has been completely uploaded */
+    /**
+     * Returns true if the item has been completely uploaded.
+     *
+     * Thread-safe (volatile variables).
+     */
     public boolean isUploaded() {
         return numBytesUploaded == szBytes;
     }
 
-    /** paints the background color to reflect how far completed this upload is */
+    /**
+     * Paints the background color to reflect how far completed this upload is.
+     *
+     * MUST be called from the Swing EDT.
+     */
     public void paintComponent(Graphics g) {
+        assert SwingUtilities.isEventDispatchThread();
         Graphics2D g2d = (Graphics2D)g;
         Color c = g2d.getColor();
 
@@ -159,7 +202,11 @@ public class UploadItem extends JPanel {
         uploader.removeItemToUpload(this);
     }
 
-    /** returns the number of bytes uploaded */
+    /**
+     * Returns the number of bytes uploaded.
+     *
+     * Thread-safe (volatile variable).
+     */
     public long getNumBytesUploaded() {
         return numBytesUploaded;
     }
@@ -168,34 +215,44 @@ public class UploadItem extends JPanel {
      * Sets the number of bytes of this item which have been uploaded.  When all
      * bytes have been uploaded, the remove button is replaced with a static
      * checkmark.  The progress text for this item is appropriately updated.
+     *
+     * Thread-safe (volatile variable and asynchronously updates UI from Swing EDT).
      */
     public void setNumBytesUploaded(long n) {
         numBytesUploaded = n;
-        if(isUploaded()) {
-            btnRemove.setIcon(ICON_CHECKMARK);
-            btnRemove.setPressedIcon(ICON_CHECKMARK);
-            btnRemove.setRolloverIcon(ICON_CHECKMARK);
-            setProgressText("uploaded!", false);
-        }
-        else {
-            setProgressText(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded", false);
-        }
-        this.repaint();
+        final UploadItem me = this;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if(isUploaded()) {
+                    btnRemove.setIcon(ICON_CHECKMARK);
+                    btnRemove.setPressedIcon(ICON_CHECKMARK);
+                    btnRemove.setRolloverIcon(ICON_CHECKMARK);
+                    setProgressTextDirectly("uploaded!", false);
+                }
+                else {
+                    setProgressTextDirectly(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded", false);
+                }
+                me.repaint();
+            }
+        });
     }
 
-    /** convenience wrapper for setNumBytesUploaded() */
-    public void incrNumBytesUploaded(long bytesUploaded) {
-        setNumBytesUploaded(numBytesUploaded + bytesUploaded);
-    }
-
-    /** returns whether this item has failed to upload */
+    /**
+     * Returns whether this item has failed to upload.
+     *
+     * Thread-safe (volatile variable).
+     */
     public boolean isFailed() {
         return failed;
     }
 
-    /** sets whether this upload item is in a failed state or not */
+    /**
+     * Sets whether this upload item is in a failed state or not.
+     *
+     * Thread-safe (volatile variable and thread-safe Swing method).
+     */
     public void setFailed(boolean b) {
         this.failed = b;
-        this.repaint();
+        this.repaint(); // thread-safe
     }
 }

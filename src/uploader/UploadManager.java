@@ -15,6 +15,10 @@ import javax.swing.SwingUtilities;
  * A thread which manages the upload queue.  It refreshes the UI as uploads
  * progress and handles requests to upload new items or cancel uploads.
  *
+ * Note: UploadManager updates UploadItem fields.  This is done in a thread-safe
+ * manner.  Updates which modify UI components will be run asynchronously on the
+ * Swing EDT.
+ *
  * @author David Underhill
  */
 public class UploadManager extends Thread {
@@ -134,6 +138,7 @@ public class UploadManager extends Thread {
         long prevTime = System.currentTimeMillis(), now;
         double curRate_Bps = 0;
         long bytes_uploaded = 0;
+        long totalBytesUploaded = 0;
         while(item!=null) {
             // upload the next chunk of this item
             bytes_uploaded = uploadMech.uploadNextChunk(CHUNK_SIZE);
@@ -142,7 +147,8 @@ public class UploadManager extends Thread {
                 return;
             }
             else {
-                item.incrNumBytesUploaded(bytes_uploaded);
+                totalBytesUploaded += bytes_uploaded;
+                item.setNumBytesUploaded(totalBytesUploaded);
                 incrNumBytesLeftToUpload(-bytes_uploaded);
                 now = System.currentTimeMillis();
                 curRate_Bps = (1000.0*bytes_uploaded) / (now - prevTime);
