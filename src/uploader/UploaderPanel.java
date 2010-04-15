@@ -69,7 +69,12 @@ public class UploaderPanel extends JPanel {
         // has trouble distinguishing between double-clicking to open a folder
         // or rename it (yuck)
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-        uploader = new UploadManager(this, new TestUploadMechanism(250, 0.25, 0.10));
+
+        final int NUM_THREADS = 3;
+        final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
+        for(int i=0; i<NUM_THREADS; i++)
+            uploadMechs[i] = new TestUploadMechanism(250, 0.2, 0.03, System.currentTimeMillis()+i*100);
+        uploader = new UploadManager(this, uploadMechs);
 
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));
