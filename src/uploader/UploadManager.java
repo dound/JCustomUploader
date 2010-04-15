@@ -26,6 +26,9 @@ public class UploadManager {
     private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
     private static final long CHUNK_SIZE = 4096;
 
+    /** the name of the items in the queue (a generic name might be 'item') */
+    private static final String ITEM_NAME = "photo";
+
     /** weight of the previous upload rate when computing a new upload rate */
     private static final double ALPHA = 0.5;
 
@@ -49,7 +52,7 @@ public class UploadManager {
     private volatile boolean uploadingEnabled = true;
 
     /** shared statistics about pending/completed uploads */
-    private volatile int    numPhotosUploaded    = 0;
+    private volatile int    numItemsUploaded     = 0;
     private volatile long   numBytesLeftToUpload = 0;
 
     private final UploaderThread[] uploaderThreads;
@@ -165,7 +168,7 @@ public class UploadManager {
                     synchronized(lock) {
                         completedList.add(item);
                         itemBeingUploaded = null;
-                        numPhotosUploaded += 1;
+                        numItemsUploaded += 1;
                     }
                     item.setNumBytesUploaded(item.length()); // 100% complete
                     updateProgressTexts();
@@ -406,7 +409,7 @@ public class UploadManager {
         int itemsLeft;
         int itemsFailed;
         long numBytesLeftToUploadCopy;
-        int numPhotosUploadedCopy;
+        int numItemsUploadedCopy;
 
         // get a copy of all the info we need up front => minimize the critical section size
         synchronized(lock) {
@@ -418,7 +421,7 @@ public class UploadManager {
             itemsLeft = getNumItemsLeftToUpload();
             itemsFailed = failedList.size();
             numBytesLeftToUploadCopy = numBytesLeftToUpload;
-            numPhotosUploadedCopy = numPhotosUploaded;
+            numItemsUploadedCopy = numItemsUploaded;
         }
 
         String pending;
@@ -426,7 +429,7 @@ public class UploadManager {
             pending = "Nothing to upload yet.";
         else {
             String megabytesLeft = SZ_FMT.format(numBytesLeftToUploadCopy / 1024.0 / 1024.0 + 0.01); // never show 0.00
-            pending = itemsLeft + pl(" photo",itemsLeft) + " left to upload (" + megabytesLeft + " MB).  ";
+            pending = itemsLeft + pl(" "+ITEM_NAME,itemsLeft) + " left to upload (" + megabytesLeft + " MB).  ";
 
             // append the estimated time remaining (round up to the nearest minute if displaying minutes)
             if(!uploadingEnabled)
@@ -448,15 +451,15 @@ public class UploadManager {
         }
 
         String completed;
-        if(numPhotosUploadedCopy == 0)
-            completed = "No photos uploaded yet.";
-        else if(numPhotosUploadedCopy == 1)
-            completed = "1 photo has been uploaded.";
+        if(numItemsUploadedCopy == 0)
+            completed = "No " + ITEM_NAME + "s uploaded yet.";
+        else if(numItemsUploadedCopy == 1)
+            completed = "1 " + ITEM_NAME + " has been uploaded.";
         else
-            completed = numPhotosUploadedCopy + " photos have been uploaded.";
+            completed = numItemsUploadedCopy + " " + ITEM_NAME + "s have been uploaded.";
 
         if(itemsFailed > 0)
-            completed += "  " + itemsFailed + pl(" photo",itemsFailed) + " failed to upload.";
+            completed += "  " + itemsFailed + pl(" "+ITEM_NAME,itemsFailed) + " failed to upload.";
 
         setProgressTexts(pending, completed);
     }

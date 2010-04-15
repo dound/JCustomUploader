@@ -83,7 +83,7 @@ public class UploadItem extends JPanel {
         btnRemove.setBorderPainted(false);
         btnRemove.setOpaque(false);
         Util.prepButtonUI(btnRemove, ICON_CLOSE_PRESSED, ICON_CLOSE_HOVER);
-        btnRemove.setToolTipText("Don't upload this photo");
+        btnRemove.setToolTipText("Don't upload this item");
         Dimension btnRmSz = new Dimension(17, 22);
         Util.setSize(btnRemove, btnRmSz);
         btnRemove.addActionListener(new ActionListener() {
