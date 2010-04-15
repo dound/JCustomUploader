@@ -160,7 +160,7 @@ public class UploadManager extends Thread {
                 item.setNumBytesUploaded(item.length()); // 100% complete
                 numPhotosUploaded += 1;
                 updateProgressTexts();
-                SwingUtilities.invokeLater(new ShowComponent(uploaderUI.getUIClear()));
+                showComponent(uploaderUI.getUIClear());
                 return;
             }
 
@@ -193,7 +193,7 @@ public class UploadManager extends Thread {
         if(itemBeingUploaded != null) {
             if(why != null) {
                 failedList.add(itemBeingUploaded);
-                SwingUtilities.invokeLater(new SetNumFailures(failedList.size()));
+                setNumFailures(failedList.size());
                 itemBeingUploaded.setProgressText(why, true);
             }
             long bytesLeft = itemBeingUploaded.length() - itemBeingUploaded.getNumBytesUploaded();
@@ -390,41 +390,33 @@ public class UploadManager extends Thread {
         if(itemsFailed > 0)
             completed += "  " + itemsFailed + pl(" photo",itemsFailed) + " failed to upload.";
 
-        SwingUtilities.invokeLater(new SetProgressTexts(pending, completed));
+        setProgressTexts(pending, completed);
     }
 
-    /** a runnable which makes the requested component visible when run */
-    private class ShowComponent implements Runnable {
-        private final Component c;
-        public ShowComponent(Component c) {
-            this.c = c;
-        }
-        public void run() {
-            assert SwingUtilities.isEventDispatchThread();
-            c.setVisible(true);
-        }
+    /** Make the requested component visible.  Executes on the Swing EDT. */
+    private void showComponent(final Component c) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                c.setVisible(true);
+            }
+        });
     }
 
-    /** runnable which sets the number of failures on the uploader UI */
-    private class SetNumFailures implements Runnable {
-        private final int n;
-        public SetNumFailures(int n) {
-            this.n = n;
-        }
-        public void run() {
-            uploaderUI.setNumberFailures(n);
-        }
+    /** sets the number of failures on the uploader UI from the Swing EDT */
+    private void setNumFailures(final int n) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                uploaderUI.setNumberFailures(n);
+            }
+        });
     }
 
-    /** runnable which sets the progress/completed texts on the uploader UI */
-    private class SetProgressTexts implements Runnable {
-        private final String pending, completed;
-        public SetProgressTexts(String pending, String completed) {
-            this.pending = pending;
-            this.completed = completed;
-        }
-        public void run() {
-            uploaderUI.setProgressTexts(pending, completed);
-        }
+    /** sets the progress/completed texts on the uploader UI from the Swing EDT */
+    private void setProgressTexts(final String pending, final String completed) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                uploaderUI.setProgressTexts(pending, completed);
+            }
+        });
     }
 }
