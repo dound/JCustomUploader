@@ -32,9 +32,13 @@ import uploader.util.Util;
  * @author David Underhill
  */
 public class UploaderPanel extends JPanel {
-    private static final int MARGIN_SIZE = 5;
+    /** main background color of the UI */
     public static final Color BG_COLOR = Color.WHITE;
 
+    /** size of the margins around the edge of the GUI and between some components */
+    private static final int MARGIN_SIZE = 5;
+
+    // load icons used in the UI
     private static final ImageIcon ICON_ADD = Util.createImageIcon("/resources/add.png");
     private static final ImageIcon ICON_ADD_PRESSED = Util.createImageIcon("/resources/add-press.png");
     private static final ImageIcon ICON_ADD_HOVER = Util.createImageIcon("/resources/add-hover.png");
