@@ -21,6 +21,9 @@ public class UploadManager extends Thread {
     private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
     private static final long CHUNK_SIZE = 4096;
 
+    /** weight of the previous upload rate when computing a new upload rate */
+    private static final double ALPHA = 0.5;
+
     /**
      * Maximum size file which will be accepted.  Note: This can be bypassed if
      * the file is changed between when we are asked to upload it and the time
@@ -45,6 +48,11 @@ public class UploadManager extends Thread {
 
     /** the item currently being uploaded, if any */
     private volatile UploadItem itemBeingUploaded = null;
+
+    /** statistics about pending/completed uploads */
+    private int numPhotosUploaded = 0;
+    private volatile long numBytesLeftToUpload = 0;
+    private double recentUploadRate_Bps = 0;
 
     /**
      * Constructs a new UploadManager which will manage uploads using the
@@ -112,27 +120,47 @@ public class UploadManager extends Thread {
             cancelCurrentUpload(uploadMech.getErrorText());
             return;
         }
-        item.setItemSize(uploadMech.getSizeOfCurrentUpload()); // just in case the file size changed
+
+        // check the file size just in case it changed since the user added it
+        long actualSize = uploadMech.getSizeOfCurrentUpload();
+        if(item.length() != actualSize) {
+            long diff = actualSize - item.length();
+            item.setItemSize(actualSize);
+            incrNumBytesLeftToUpload(diff);
+            updateProgressTexts();
+        }
 
         // loop until the upload is canceled or done
+        long prevTime = System.currentTimeMillis(), now;
+        double curRate_Bps = 0;
+        long bytes_uploaded = 0;
         while(item!=null) {
             // upload the next chunk of this item
-            long bytes_uploaded = uploadMech.uploadNextChunk(CHUNK_SIZE);
+            bytes_uploaded = uploadMech.uploadNextChunk(CHUNK_SIZE);
             if(bytes_uploaded == -1L) {
                 cancelCurrentUpload(uploadMech.getErrorText());
                 return;
             }
-            else
+            else {
                 item.incrNumBytesUploaded(bytes_uploaded);
+                incrNumBytesLeftToUpload(-bytes_uploaded);
+                now = System.currentTimeMillis();
+                curRate_Bps = (1000.0*bytes_uploaded) / (now - prevTime);
+                prevTime = now;
+                recentUploadRate_Bps = (recentUploadRate_Bps*ALPHA) + (1.0-ALPHA)*curRate_Bps;
+                updateProgressTexts();
+            }
 
             // check to see if the upload is done
             if(uploadMech.isUploadComplete()) {
                 synchronized(this) {
-                    item.setNumBytesUploaded(item.length()); // 100% complete
                     completedList.add(item);
-                    SwingUtilities.invokeLater(new ShowComponent(uploaderUI.getUIClear()));
                     itemBeingUploaded = null;
                 }
+                item.setNumBytesUploaded(item.length()); // 100% complete
+                numPhotosUploaded += 1;
+                updateProgressTexts();
+                SwingUtilities.invokeLater(new ShowComponent(uploaderUI.getUIClear()));
                 return;
             }
 
@@ -146,6 +174,12 @@ public class UploadManager extends Thread {
                 item = itemBeingUploaded;
             }
         }
+        // When the upload was canceled, the remaining bytes were removed from
+        // counter.  We also counted the last chunk sent before we realized the
+        // item had been cancelled, so go ahead and add those bytes back so we
+        // don't double-count them.
+        if(bytes_uploaded > 0)
+            this.incrNumBytesLeftToUpload(bytes_uploaded);
 
         // the item's upload has been canceled, but we've partially uploaded it
         uploadMech.cancelUpload();
@@ -162,8 +196,11 @@ public class UploadManager extends Thread {
                 SwingUtilities.invokeLater(new SetNumFailures(failedList.size()));
                 itemBeingUploaded.setProgressText(why, true);
             }
+            long bytesLeft = itemBeingUploaded.length() - itemBeingUploaded.getNumBytesUploaded();
+            incrNumBytesLeftToUpload(-bytesLeft);
             itemBeingUploaded.setFailed(true);
             itemBeingUploaded = null;
+            updateProgressTexts();
         }
     }
 
@@ -194,6 +231,8 @@ public class UploadManager extends Thread {
 
         synchronized(this) {
             uploadQueue.add(item);
+            incrNumBytesLeftToUpload(f.length());
+            updateProgressTexts();
             notifyAll();
         }
     }
@@ -211,6 +250,8 @@ public class UploadManager extends Thread {
             else {
                 try {
                     uploadQueue.remove(item); // remove it from the upload queue (hasn't started yet)
+                    incrNumBytesLeftToUpload(-item.length());
+                    updateProgressTexts();
                 }
                 catch(NoSuchElementException e) {
                     // too late: it has already been uploaded
@@ -229,6 +270,7 @@ public class UploadManager extends Thread {
     /** sets whether uploads may be done */
     public synchronized void setUploadingEnabled(boolean b) {
         this.uploadingEnabled = b;
+        updateProgressTexts();
         notifyAll();
     }
 
@@ -267,15 +309,88 @@ public class UploadManager extends Thread {
                 item.setProgressText("will retry this upload", false);
                 item.setFailed(false);
                 item.setNumBytesUploaded(0);
+                incrNumBytesLeftToUpload(item.length());
                 itr.remove();
                 uploadQueue.add(item);
             }
             uploaderUI.getUIRetry().setVisible(false);
+            updateProgressTexts();
             notifyAll();
         }
         Container pnlUploadItems = uploaderUI.getUploadItemsContainer();
         pnlUploadItems.validate();
         pnlUploadItems.repaint();
+    }
+
+    /** gets the number of uploads in progress */
+    private synchronized int getNumUploadsInProgress() {
+        if(itemBeingUploaded == null)
+            return 0;
+        else
+            return 1;
+    }
+
+    /** gets the items which are waiting to be uploaded or in the process of being uploaded */
+    private synchronized int getNumItemsLeftToUpload() {
+        return this.uploadQueue.size() + getNumUploadsInProgress();
+    }
+
+    /** updates the number of bytes left to upload */
+    private synchronized void incrNumBytesLeftToUpload(long n) {
+        numBytesLeftToUpload += n;
+    }
+
+    /** Simple pluralizer.  Returns s if n is 1 and s+"s" if n!=1. */
+    private static final String pl(String s, int n) {
+        if(n==1)
+            return s;
+        else
+            return s + "s";
+    }
+
+    /** updates the progress texts with the latest stats */
+    private synchronized void updateProgressTexts() {
+        String pending;
+        int itemsLeft = getNumItemsLeftToUpload();
+        if(itemsLeft==0)
+            pending = "Nothing to upload yet.";
+        else {
+            String megabytesLeft = SZ_FMT.format(numBytesLeftToUpload / 1024.0 / 1024.0 + 0.01); // never show 0.00
+            pending = itemsLeft + pl(" photo",itemsLeft) + " left to upload (" + megabytesLeft + " MB).  ";
+
+            // append the estimated time remaining (round up to the nearest minute if displaying minutes)
+            if(!uploadingEnabled)
+                pending += "  Uploading is currently disabled.";
+            else if(itemsLeft>0 && recentUploadRate_Bps>0) {
+                int secondsLeft = (int)(numBytesLeftToUpload / recentUploadRate_Bps);
+                if(secondsLeft < 60)
+                    pending += "Less than 1 minute remaining.";
+                else if(secondsLeft < 3600) {
+                    int mins = (secondsLeft+30) / 60;
+                    pending += "About " + mins + pl(" minute",mins) + " remaining.";
+                }
+                else {
+                    int hours = secondsLeft / 3600;
+                    int mins  = ((secondsLeft - (hours*3600))+30) / 60;
+                    pending += "About " + hours + pl(" hour",hours) + " and " + mins + pl(" minute",mins) + " remaining.";
+                }
+                //System.out.println("rate=" + recentUploadRate_Bps);
+            }
+        }
+
+        String completed;
+        if(numPhotosUploaded == 0)
+            completed = "No photos uploaded yet.";
+        else if(numPhotosUploaded == 1)
+            completed = "1 photo has been uploaded.";
+        else
+            completed = numPhotosUploaded + " photos have been uploaded.";
+
+        int itemsFailed = failedList.size();
+        if(itemsFailed > 0)
+            completed += "  " + itemsFailed + pl(" photo",itemsFailed) + " failed to upload.";
+
+        SwingUtilities.invokeLater(new SetProgressTexts(pending, completed));
     }
 
     /** a runnable which makes the requested component visible when run */
@@ -298,6 +413,18 @@ public class UploadManager extends Thread {
         }
         public void run() {
             uploaderUI.setNumberFailures(n);
+        }
+    }
+
+    /** runnable which sets the progress/completed texts on the uploader UI */
+    private class SetProgressTexts implements Runnable {
+        private final String pending, completed;
+        public SetProgressTexts(String pending, String completed) {
+            this.pending = pending;
+            this.completed = completed;
+        }
+        public void run() {
+            uploaderUI.setProgressTexts(pending, completed);
         }
     }
 }
