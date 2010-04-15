@@ -23,9 +23,14 @@ import javax.swing.filechooser.FileFilter;
 
 import uploader.mechanisms.TestUploadMechanism;
 import uploader.mechanisms.UploadMechanism;
-import uploader.util.ImagePreview;
+import uploader.util.ImagePreviewAccessory;
 import uploader.util.Util;
 
+/**
+ * Uploader UI.
+ *
+ * @author David Underhill
+ */
 public class UploaderPanel extends JPanel {
     private static final int MARGIN_SIZE = 5;
     public static final Color BG_COLOR = Color.WHITE;
@@ -48,7 +53,7 @@ public class UploaderPanel extends JPanel {
 
     private final JFileChooser FC;
     private final FileFilter fileFilter;
-    private final ImagePreview previewAccessory;
+    private final ImagePreviewAccessory previewAccessory;
 
     private final JPanel pnlUploadList = new JPanel();
     private final JLabel txtPending = new JLabel("Nothing to upload.");
@@ -78,7 +83,7 @@ public class UploaderPanel extends JPanel {
         FC.setMultiSelectionEnabled(true);
         FC.setFileFilter(filter);
         fileFilter = filter;
-        previewAccessory = new ImagePreview(FC);
+        previewAccessory = new ImagePreviewAccessory(FC);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(new EmptyBorder(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE));
