@@ -25,7 +25,7 @@ public class UploaderApplet extends JApplet {
 
     private void createGUI() {
         //Create and set up the content pane.
-        UploaderPanel newContentPane = new UploaderPanel();
+        UploaderPanel newContentPane = new UploaderPanel(getWidth());
         newContentPane.setOpaque(true);
         setContentPane(newContentPane);
     }

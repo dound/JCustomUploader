@@ -60,7 +60,7 @@ public class UploaderPanel extends JPanel {
     private final UploadManager uploader;
     private boolean uploadingEnabled = true;
 
-    public UploaderPanel() {
+    public UploaderPanel(int width) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(new EmptyBorder(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE));
         this.setBackground(BG_COLOR);
@@ -71,7 +71,7 @@ public class UploaderPanel extends JPanel {
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));
         add(create_upload_list());
-        add(create_footer_panel());
+        add(create_footer_panel(width));
 
         uploader.start();
     }
@@ -161,7 +161,7 @@ public class UploaderPanel extends JPanel {
         return spUploadList;
     }
 
-    private JPanel create_footer_panel() {
+    private JPanel create_footer_panel(int width) {
         JPanel pnlFooter = new JPanel();
         pnlFooter.setOpaque(false);
         pnlFooter.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -196,6 +196,12 @@ public class UploaderPanel extends JPanel {
         txtUploaded.setVerticalAlignment(SwingConstants.CENTER);
         txtPending.setAlignmentY(Component.CENTER_ALIGNMENT);
         txtUploaded.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        // use the remainder of the panel's width for the text fields
+        Dimension txtSz = new Dimension(width - btnSz.width - MARGIN_SIZE*3,
+                                        Math.max(txtPending.getPreferredSize().height, txtUploaded.getPreferredSize().height));
+        Util.setSize(txtPending, txtSz);
+        Util.setSize(txtUploaded, txtSz);
 
         pnlFooter.add(Box.createRigidArea(new Dimension(0, 5)));
         pnlFooter.add(create_footer_panel_top());
