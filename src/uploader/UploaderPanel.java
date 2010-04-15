@@ -65,6 +65,9 @@ public class UploaderPanel extends JPanel {
         this.setBorder(new EmptyBorder(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE));
         this.setBackground(BG_COLOR);
 
+        // annoying ui fix: don't let users edit filenames because JFileChooser
+        // has trouble distinguishing between double-clicking to open a folder
+        // or rename it (yuck)
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
         uploader = new UploadManager(this, new TestUploadMechanism(250, 0.25, 0.10));
 
