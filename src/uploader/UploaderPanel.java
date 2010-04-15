@@ -19,10 +19,12 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
 
 public class UploaderPanel extends JPanel {
     private static final int MARGIN_SIZE = 5;
     public static final Color BG_COLOR = Color.WHITE;
+
     private static final ImageIcon ICON_ADD = Util.createImageIcon("/resources/add.png");
     private static final ImageIcon ICON_ADD_PRESSED = Util.createImageIcon("/resources/add-press.png");
     private static final ImageIcon ICON_ADD_HOVER = Util.createImageIcon("/resources/add-hover.png");
@@ -39,18 +41,9 @@ public class UploaderPanel extends JPanel {
     private static final ImageIcon ICON_RETRY_PRESSED = Util.createImageIcon("/resources/retry-press.png");
     private static final ImageIcon ICON_RETRY_HOVER = Util.createImageIcon("/resources/retry-hover.png");
 
-    private static final JFileChooser FC;
-    private static final ImageFileFilter FILTER_IMAGES = new ImageFileFilter();
-    private static final ImagePreview IMAGE_PREVIEW_ACCESSORY;
-    static {
-        System.setProperty("swing.disableFileChooserSpeedFix", "true");
-        UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-        FC = new JFileChooser();
-        FC.setAcceptAllFileFilterUsed(false);
-        FC.setMultiSelectionEnabled(true);
-        FC.setFileFilter(FILTER_IMAGES);
-        IMAGE_PREVIEW_ACCESSORY = new ImagePreview(FC);
-    }
+    private final JFileChooser FC;
+    private final FileFilter fileFilter;
+    private final ImagePreview previewAccessory;
 
     private final JPanel pnlUploadList = new JPanel();
     private final JLabel txtPending = new JLabel();
@@ -61,14 +54,29 @@ public class UploaderPanel extends JPanel {
     private boolean uploadingEnabled = true;
 
     public UploaderPanel(int width) {
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setBorder(new EmptyBorder(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE));
-        this.setBackground(BG_COLOR);
+        this(width, null, true);
+    }
 
+    public UploaderPanel(int width, FileFilter filter) {
+        this(width, filter, true);
+    }
+
+    public UploaderPanel(int width, FileFilter filter, boolean useImagePreviewAccessory) {
         // annoying ui fix: don't let users edit filenames because JFileChooser
         // has trouble distinguishing between double-clicking to open a folder
         // or rename it (yuck)
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+
+        FC = new JFileChooser();
+        FC.setAcceptAllFileFilterUsed(false);
+        FC.setMultiSelectionEnabled(true);
+        FC.setFileFilter(filter);
+        fileFilter = filter;
+        previewAccessory = new ImagePreview(FC);
+
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setBorder(new EmptyBorder(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE));
+        this.setBackground(BG_COLOR);
 
         final int NUM_THREADS = 3;
         final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
@@ -97,7 +105,7 @@ public class UploaderPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 FC.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 FC.setDialogTitle("Choose image files to upload");
-                FC.setAccessory(IMAGE_PREVIEW_ACCESSORY);
+                FC.setAccessory(previewAccessory);
                 int ret = FC.showDialog(btnAddImages, "Upload");
                 if(ret == JFileChooser.APPROVE_OPTION) {
                     // TODO: remove these example entries
@@ -122,7 +130,7 @@ public class UploaderPanel extends JPanel {
                 if(ret == JFileChooser.APPROVE_OPTION) {
                     for(File dir : FC.getSelectedFiles()) {
                         for(File f : dir.listFiles()) {
-                            if(!f.isDirectory() && FILTER_IMAGES.accept(f)) {
+                            if(!f.isDirectory() && fileFilter.accept(f)) {
                                 uploader.addFileToUpload(f);
                             }
                         }
