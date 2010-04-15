@@ -33,7 +33,7 @@ public class UploadManager extends Thread {
     private final UploaderPanel uploaderUI;
 
     /** the object which will actually uploads each file */
-    final UploadMechanism uploadMech;
+    private final UploadMechanism uploadMech;
 
     /** list of items to upload */
     private final LinkedList<UploadItem> uploadQueue = new LinkedList<UploadItem>();
