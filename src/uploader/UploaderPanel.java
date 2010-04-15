@@ -53,7 +53,7 @@ public class UploaderPanel extends JPanel {
     }
 
     private final JPanel pnlUploadList = new JPanel();
-    private final JLabel txtPending = new JLabel("No photos added yet.");
+    private final JLabel txtPending = new JLabel("Nothing to upload yet.");
     private final JLabel txtUploaded = new JLabel("No photos uploaded yet.");
     private final JButton btnRetryFailed = new JButton("Retry all 999 failed uploads", ICON_RETRY);
     private final JButton btnClearCompleted = new JButton("Clear completed uploads", ICON_CLEAR);
@@ -251,7 +251,7 @@ public class UploaderPanel extends JPanel {
     /** sets the UI components which show pending and completed upload info */
     public void setProgressTexts(String pending, String completed) {
         txtPending.setText(pending);
-        txtUploaded.setText(pending);
+        txtUploaded.setText(completed);
     }
 
     /** sets the number of outstanding failures */
