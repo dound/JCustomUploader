@@ -425,10 +425,10 @@ public class UploadManager {
 
         String pending;
         if(itemsLeft==0)
-            pending = "Nothing to upload yet.";
+            pending = "Nothing to upload.";
         else {
             String megabytesLeft = SZ_FMT.format(numBytesLeftToUploadCopy / 1024.0 / 1024.0 + 0.01); // never show 0.00
-            pending = itemsLeft + pl(" "+itemType,itemsLeft) + " left to upload (" + megabytesLeft + " MB).  ";
+            pending = itemsLeft + pl(" "+itemType,itemsLeft) + " left (" + megabytesLeft + " MB).  ";
 
             // append the estimated time remaining (round up to the nearest minute if displaying minutes)
             if(!uploadingEnabled)
@@ -436,22 +436,24 @@ public class UploadManager {
             else if(itemsLeft>0 && totRecentUploadRate_Bps>0) {
                 int secondsLeft = (int)(numBytesLeftToUploadCopy / totRecentUploadRate_Bps);
                 if(secondsLeft < 60)
-                    pending += "Less than 1 minute remaining.";
+                    pending += "Less than 1 minute";
                 else if(secondsLeft < 3600) {
                     int mins = (secondsLeft+30) / 60;
-                    pending += "About " + mins + pl(" minute",mins) + " remaining.";
+                    pending += "About " + mins + pl(" minute",mins);
                 }
                 else {
                     int hours = secondsLeft / 3600;
                     int mins  = ((secondsLeft - (hours*3600))+30) / 60;
-                    pending += "About " + hours + pl(" hour",hours) + " and " + mins + pl(" minute",mins) + " remaining.";
+                    pending += "About " + hours + pl(" hour",hours) + " and " + mins + pl(" minute",mins);
                 }
+                int kbps = (int)(8 * totRecentUploadRate_Bps / 1000);
+                pending += " remaining at " + kbps + " kb/s";
             }
         }
 
         String completed;
         if(numItemsUploadedCopy == 0)
-            completed = "No " + itemType + "s uploaded yet.";
+            completed = "Nothing uploaded yet.";
         else if(numItemsUploadedCopy == 1)
             completed = "1 " + itemType + " has been uploaded.";
         else

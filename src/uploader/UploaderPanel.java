@@ -46,8 +46,8 @@ public class UploaderPanel extends JPanel {
     private final ImagePreview previewAccessory;
 
     private final JPanel pnlUploadList = new JPanel();
-    private final JLabel txtPending = new JLabel(" ");
-    private final JLabel txtUploaded = new JLabel(" ");
+    private final JLabel txtPending = new JLabel("Nothing to upload.");
+    private final JLabel txtUploaded = new JLabel("Nothing uploaded yet.");
     private final JButton btnRetryFailed = new JButton("Retry all 999 failed uploads", ICON_RETRY);
     private final JButton btnClearCompleted = new JButton("Clear completed uploads", ICON_CLEAR);
     private final UploadManager uploader;
