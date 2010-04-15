@@ -21,7 +21,6 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
-import uploader.mechanisms.TestUploadMechanism;
 import uploader.mechanisms.UploadMechanism;
 import uploader.util.ImagePreviewAccessory;
 import uploader.util.Util;
@@ -67,16 +66,16 @@ public class UploaderPanel extends JPanel {
     private final UploadManager uploader;
     private boolean uploadingEnabled = true;
 
-    public UploaderPanel(int width) {
-        this(width, "item", null, true);
+    public UploaderPanel(int width, UploadMechanism[] uploadMechs) {
+        this(width, uploadMechs, "item", null, true);
     }
-    public UploaderPanel(int width, String itemType) {
-        this(width, itemType, null, true);
+    public UploaderPanel(int width, UploadMechanism[] uploadMechs, String itemType) {
+        this(width, uploadMechs, itemType, null, true);
     }
-    public UploaderPanel(int width, String itemType, FileFilter filter) {
-        this(width, itemType, filter, true);
+    public UploaderPanel(int width, UploadMechanism[] uploadMechs, String itemType, FileFilter filter) {
+        this(width, uploadMechs, itemType, filter, true);
     }
-    public UploaderPanel(int width, String itemType, FileFilter filter, boolean useImagePreviewAccessory) {
+    public UploaderPanel(int width, UploadMechanism[] uploadMechs, String itemType, FileFilter filter, boolean useImagePreviewAccessory) {
         // annoying ui fix: don't let users edit filenames because JFileChooser
         // has trouble distinguishing between double-clicking to open a folder
         // or rename it (yuck)
@@ -93,17 +92,12 @@ public class UploaderPanel extends JPanel {
         this.setBorder(new EmptyBorder(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE));
         this.setBackground(BG_COLOR);
 
-        final int NUM_THREADS = 3;
-        final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
-        for(int i=0; i<NUM_THREADS; i++)
-            uploadMechs[i] = new TestUploadMechanism(250, 0.2, 0.03, System.currentTimeMillis()+i*100);
-        uploader = new UploadManager(this, itemType, uploadMechs);
-
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));
         add(create_upload_list());
         add(create_footer_panel(width));
 
+        uploader = new UploadManager(this, itemType, uploadMechs);
         uploader.start();
     }
 

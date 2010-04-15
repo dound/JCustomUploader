@@ -3,6 +3,8 @@ package uploader;
 import javax.swing.JApplet;
 import javax.swing.SwingUtilities;
 
+import uploader.mechanisms.TestUploadMechanism;
+import uploader.mechanisms.UploadMechanism;
 import uploader.util.ImageFileFilter;
 
 /**
@@ -25,7 +27,11 @@ public class UploaderApplet extends JApplet {
     }
 
     private void createGUI() {
-        UploaderPanel newContentPane = new UploaderPanel(getWidth(), "photo", new ImageFileFilter(), true);
+        final int NUM_THREADS = 3;
+        final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
+        for(int i=0; i<NUM_THREADS; i++)
+            uploadMechs[i] = new TestUploadMechanism(250, 0.2, 0.03, System.currentTimeMillis()+i*100);
+        UploaderPanel newContentPane = new UploaderPanel(getWidth(), uploadMechs, "photo", new ImageFileFilter(), true);
         newContentPane.setOpaque(true);
         setContentPane(newContentPane);
     }
