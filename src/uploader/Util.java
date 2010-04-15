@@ -1,6 +1,8 @@
 package uploader;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Insets;
 
 import javax.swing.ImageIcon;
@@ -32,5 +34,12 @@ public final class Util {
         // disable content area fill and border painting to make buttons look more like links
         //b.setContentAreaFilled(false);
         //b.setBorderPainted(false);
+    }
+
+    /** Sets c's min, max, and preferred sizes to d. */
+    public static final void setSize(Component c, Dimension d) {
+        c.setMinimumSize(d);
+        c.setPreferredSize(d);
+        c.setMaximumSize(d);
     }
 }

@@ -48,9 +48,7 @@ public class UploadItem extends JPanel {
 
         JLabel lblSz = new JLabel(SZ_FMT.format(sizeInBytes / 1024.0 / 1024.0) + " MB", JLabel.RIGHT);
         Dimension lblSzDim = new Dimension(65, lblSz.getMaximumSize().height);
-        lblSz.setMinimumSize(lblSzDim);
-        lblSz.setPreferredSize(lblSzDim);
-        lblSz.setMaximumSize(lblSzDim);
+        Util.setSize(lblSz, lblSzDim);
         add(lblSz);
         add(Box.createRigidArea(new Dimension(15, 0)));
 
@@ -62,15 +60,12 @@ public class UploadItem extends JPanel {
         txtFn.setHighlighter(null); // don't highlight selected text
         txtFn.setOpaque(false);
         Dimension lblFnDim = new Dimension(400, txtFn.getPreferredSize().height);
-        txtFn.setPreferredSize(lblFnDim);
-        txtFn.setMaximumSize(lblFnDim);
+        Util.setSize(txtFn, lblFnDim);
         add(txtFn);
 
         add(Box.createHorizontalGlue());
         Dimension lblProgressDim = new Dimension(175, lblSzDim.height);
-        lblProgress.setMinimumSize(lblProgressDim);
-        lblProgress.setPreferredSize(lblProgressDim);
-        lblProgress.setMaximumSize(lblProgressDim);
+        Util.setSize(lblProgress, lblProgressDim);
         add(lblProgress);
         add(Box.createRigidArea(new Dimension(5, 0)));
 
@@ -81,9 +76,7 @@ public class UploadItem extends JPanel {
         Util.prepButtonUI(btnRemove, ICON_CLOSE_PRESSED, ICON_CLOSE_HOVER);
         btnRemove.setToolTipText("Don't upload this photo");
         Dimension btnRmSz = new Dimension(17, 22);
-        btnRemove.setMinimumSize(btnRmSz);
-        btnRemove.setPreferredSize(btnRmSz);
-        btnRemove.setMaximumSize(btnRmSz);
+        Util.setSize(btnRemove, btnRmSz);
         btnRemove.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if(!isUploaded())

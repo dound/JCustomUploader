@@ -173,12 +173,8 @@ public class UploaderPanel extends JPanel {
         // make each of the buttons the same size
         Dimension btnSz = new Dimension(Math.max(btnClearCompleted.getMaximumSize().width, btnRetryFailed.getMaximumSize().width),
                                         Math.max(btnClearCompleted.getMaximumSize().height, btnRetryFailed.getMaximumSize().height));
-        btnClearCompleted.setMinimumSize(btnSz);
-        btnClearCompleted.setPreferredSize(btnSz);
-        btnClearCompleted.setMaximumSize(btnSz);
-        btnRetryFailed.setMinimumSize(btnSz);
-        btnRetryFailed.setPreferredSize(btnSz);
-        btnRetryFailed.setMaximumSize(btnSz);
+        Util.setSize(btnClearCompleted, btnSz);
+        Util.setSize(btnRetryFailed, btnSz);
 
         // hide until clicking them would have some effect
         btnClearCompleted.setVisible(false);
