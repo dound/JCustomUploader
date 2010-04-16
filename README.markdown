@@ -12,11 +12,13 @@ Advantages
     fail.  Information about the overall upload progress and expected completion
     time is updated as uploads progress and as the user adds files.
   * __Pluggable Upload Mechanism__: JCustomUploader can upload files using any
-    means you like.  You just implement a [simple
-    interface](http://github.com/dound/JCustomUploader/blob/master/src/uploader/mechanisms/UploadMechanism.java#L14)
+    means you like.  You just extend [AbstractUploadMechanism](http://github.com/dound/JCustomUploader/blob/master/src/uploader/mechanisms/AbstractUploadMechanism.java)
     which specifies how to start an upload and send a chunk of data.
     JCustomUploader handles getting the data to you, canceling uploads, and
-    performing multiple uploads in parallel.
+    performing multiple uploads in parallel.  It comes with several such mechanisms:
+    - HTTP (raw binary data)
+    - HTTP (multipart/form-data encoded)
+    - Test (uploads nowhere - useful for testing)
   * __Parallel Uploads__: Multiple uploads can be sent in parallel - you can
     choose how many uploads will be done at once.
 
