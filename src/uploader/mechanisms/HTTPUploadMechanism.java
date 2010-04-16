@@ -90,13 +90,11 @@ public class HTTPUploadMechanism extends AbstractUploadMechanism {
             sock = new Socket(host, port);
             out = sock.getOutputStream();
 
-            // add a custom header with the filename if desired
+            // build any additional headers for this request ...
             String moreHeaders = "";
-            if(addCustomHeaderWithFilename)
-                moreHeaders = "X-JCustomUploader-Filename: " + f.getName() + "\r\n";
 
             // prepare the multipart/form-data stuff if requested
-            String multiPartHeader = "";
+            String multiPartHeader = null;
             long sz = getFileSize();
             if(multipartFormDataField != null) {
                 multiPartHeader = "--" + BOUNDARY + "\r\n" +
@@ -109,6 +107,12 @@ public class HTTPUploadMechanism extends AbstractUploadMechanism {
                 // provide a Content-Type header indicating that the body in multipart form data
                 moreHeaders += "Content-Type: multipart/form-data; boundary=" + BOUNDARY + "\r\n";
             }
+
+            // add any headers specific to this file
+            String fileSpecificHeaders = getAdditionalHeaders(f);
+            if(fileSpecificHeaders == null)
+                return false;
+            moreHeaders += fileSpecificHeaders;
 
             // send the request line and headers
             String data = request_line_and_headers + moreHeaders + "Content-Length: " + sz + "\r\n\r\n";
@@ -127,6 +131,19 @@ public class HTTPUploadMechanism extends AbstractUploadMechanism {
             haltWithError(e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Returns the additional HTTP headers to send with the request for f.  By
+     * default, the X-JCustomUploader-Filename header will be returned if
+     * addCustomHeaderWithFilename=true was passed to the constructor.  null
+     * should be returned (after calling haltWithError()) if an error occurs.
+     */
+    protected String getAdditionalHeaders(File f) {
+        if(addCustomHeaderWithFilename)
+            return "X-JCustomUploader-Filename: " + f.getName() + "\r\n";
+        else
+            return "";
     }
 
     public boolean tryToUploadNextChunk(byte[] buf, int len) {
