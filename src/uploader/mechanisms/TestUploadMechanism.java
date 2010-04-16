@@ -1,5 +1,6 @@
 package uploader.mechanisms;
 
+import java.io.File;
 import java.util.Random;
 
 
@@ -38,7 +39,7 @@ public class TestUploadMechanism extends AbstractUploadMechanism {
         this.rand = new Random(seed);
     }
 
-    public boolean tryToStartUpload() {
+    public boolean tryToStartUpload(File f) {
         if(rand.nextFloat() < chanceStartFails) {
             haltWithError("random start failure");
             return false;

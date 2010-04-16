@@ -99,7 +99,7 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
         sz = f.length();
         err = null;
 
-        if(!tryToStartUpload()) {
+        if(!tryToStartUpload(f)) {
             if(err==null)
                 haltWithError("upload failed to start"); // provide a generic error if tryToStartUpload() did not
             return -1;
@@ -171,7 +171,7 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
      *
      * @return true if the upload has been started successfully
      */
-    protected abstract boolean tryToStartUpload();
+    protected abstract boolean tryToStartUpload(File f);
 
     /**
      * Called by uploadNextChunk().  Will not be called if an upload is not in
