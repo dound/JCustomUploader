@@ -6,7 +6,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.NoSuchElementException;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -295,15 +294,17 @@ public class UploadManager {
                 }
             }
             if(!wasInProgress) {
-                try {
-                    uploadQueue.remove(item); // remove it from the upload queue (hasn't started yet)
+                if(uploadQueue.remove(item)) { // is it in the upload queue? (e..g, hasn't started yet)
                     incrNumBytesLeftToUpload(-item.length());
-                    updateProgressTexts();
                 }
-                catch(NoSuchElementException e) {
+                else if(failedList.remove(item)) { // is it in the failed queue?
+                    setNumFailures(failedList.size());
+                }
+                else {
                     // too late: it has already been uploaded
                     return;
                 }
+                updateProgressTexts();
             }
         }
 
