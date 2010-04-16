@@ -38,22 +38,22 @@ public class TestUploadMechanism extends AbstractUploadMechanism {
         this.rand = new Random(seed);
     }
 
-    public long tryToStartUpload() {
+    public boolean tryToStartUpload() {
         if(rand.nextFloat() < chanceStartFails) {
             haltWithError("random start failure");
-            return -1;
+            return false;
         }
-        return getFileSize();
+        return true;
     }
 
-    public long tryToUploadNextChunk(long numBytesToUpload) {
+    public boolean tryToUploadNextChunk(byte[] buf, int len) {
         if(rand.nextFloat() < chanceNextChunkFails) {
             haltWithError("random upload failure");
-            return -1;
+            return false;
         }
         else {
             try { Thread.sleep(this.chunkXferTime_ms); } catch(InterruptedException e) {}
-            return numBytesToUpload;
+            return true;
         }
     }
 }

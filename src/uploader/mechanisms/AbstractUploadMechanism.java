@@ -1,6 +1,10 @@
 package uploader.mechanisms;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * A skeleton UploadMechanism implementation.  Override tryToStartUpload() and
@@ -9,13 +13,36 @@ import java.io.File;
  * @author David Underhill
  */
 public abstract class AbstractUploadMechanism implements UploadMechanism {
-    private File currentUploadFile = null;
+    private BufferedInputStream currentUploadFile = null;
     private long sz = 0;
     private long offset = 0;
     private String err = null;
 
+    /** buffer to store file data */
+    private final byte[] buffer;
+
+    /** constructs an AbstractUploadMechanism with an internal buffer of 4096B */
+    public AbstractUploadMechanism() {
+        this(4096);
+    }
+
+    /** constructs an AbstractUploadMechanism with an internal buffer of buf_sz bytes */
+    public AbstractUploadMechanism(int buf_sz) {
+        this.buffer = new byte[buf_sz];
+    }
+
     public void cancelUpload() {
         haltWithError("canceled");
+    }
+
+    /** closes the current file (currentUploadFile MUST NOT be null) */
+    private void closeFile() {
+        try {
+            this.currentUploadFile.close();
+        }
+        catch(IOException e) {
+            // ignore it
+        }
     }
 
     public String getErrorText() {
@@ -24,6 +51,7 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
 
     protected void haltWithError(String err) {
         this.err = err;
+        closeFile();
         this.currentUploadFile = null;
     }
 
@@ -55,15 +83,24 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
             return -1;
         }
 
-        currentUploadFile = f;
+        // open the file
+        try {
+            currentUploadFile = new BufferedInputStream(new FileInputStream(f));
+        } catch(FileNotFoundException e) {
+            haltWithError(e.getMessage());
+            return -1;
+        }
+
         offset = 0;
-        sz = f.length(); // save the value so we don't repeatedly query the FS for it
+        sz = f.length();
         err = null;
 
-        long ret = tryToStartUpload();
-        if(ret<0 && err==null)
-            haltWithError("upload failed to start"); // provide a generic error if tryToStartUpload() did not
-        return ret;
+        if(!tryToStartUpload()) {
+            if(err==null)
+                haltWithError("upload failed to start"); // provide a generic error if tryToStartUpload() did not
+            return -1;
+        }
+        return sz;
     }
 
     public final long uploadNextChunk(long numBytesToUpload) {
@@ -75,33 +112,41 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
         long max = sz - offset;
         long maxBytesWeCanUpload = Math.min(max, numBytesToUpload);
 
-        long actualBytesUploaded = 0;
+        int actualBytes = 0;
         if(maxBytesWeCanUpload > 0) {
-            actualBytesUploaded = tryToUploadNextChunk(maxBytesWeCanUpload);
-            if(actualBytesUploaded < 0) {
+            // read in the max number of bytes we can
+            try {
+                actualBytes = currentUploadFile.read(buffer, 0, (int)maxBytesWeCanUpload);
+            } catch (IOException e) {
+                haltWithError(e.getMessage());
+                return -1;
+            }
+            if(actualBytes < 0) {
+                haltWithError("unexpected end of file");
+                return -1;
+            }
+
+            // send the bytes
+            if(!tryToUploadNextChunk(buffer, actualBytes)) {
                 // set a generic error message if tryToUploadNextChunk() didn't
                 if(err == null)
                     haltWithError("upload failed");
                 return -1;
             }
-            offset += actualBytesUploaded;
+            offset += actualBytes;
         }
 
         if(this.isUploadComplete()) {
+            closeFile();
             this.currentUploadFile = null;
             err = null;
         }
-        return actualBytesUploaded;
+        return actualBytes;
     }
 
     /** returns the offset of the next byte to send */
     protected long getOffset() {
         return offset;
-    }
-
-    /** returns the file being uploaded (null if none) */
-    protected File getFile() {
-        return currentUploadFile;
     }
 
     /** returns the size of the file being uploaded (0 if none) */
@@ -114,21 +159,19 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
      * progress.  The callee should call haltWithError() if returning an error
      * code (otherwise a generic error message will be set).
      *
-     * @return -1 on error; otherwise it returns the size of the file
+     * @return true if the upload has been started successfully
      */
-    protected abstract long tryToStartUpload();
+    protected abstract boolean tryToStartUpload();
 
     /**
      * Called by uploadNextChunk().  Will not be called if an upload is not in
      * progress.  The callee should call haltWithError() if returning an error
      * code (otherwise a generic error message will be set).
      *
-     * @param num_bytes_to_upload  the max number of bytes to upload with this
-     *                             chunk; guaranteed to not be larger than the
-     *                             number of bytes left to upload.  It will
-     *                             always be greater than 0.
+     * @param buf  contains the bytes to upload
+     * @param len  the number of bytes to upload; always greater than 0
      *
-     * @return the number of bytes successfully uploaded, or -1 if the upload failed
+     * @return true if the bytes were successfully uploaded
      */
-    protected abstract long tryToUploadNextChunk(long numBytesToUpload);
+    protected abstract boolean tryToUploadNextChunk(byte[] buf, int len);
 }
