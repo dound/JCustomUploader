@@ -29,9 +29,9 @@ import uploader.util.Util;
  * @author David Underhill
  */
 public class UploadItem extends JPanel {
-    private static final Color COLOR_UPLOAD_FAILED = new Color(255, 196, 196);
-    private static final Color COLOR_UPLOAD_PROGRESS = new Color(196, 255, 255);
-    private static final Color COLOR_UPLOAD_COMPLETE = new Color(196, 255, 196);
+    private static final Color COLOR_UPLOAD_FAILED = new Color(255, 228, 228);
+    private static final Color COLOR_UPLOAD_PROGRESS = new Color(212, 255, 255);
+    private static final Color COLOR_UPLOAD_COMPLETE = new Color(212, 255, 212);
     private static final Color DARK_RED = new Color(64, 0, 0);
     private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
     private static final ImageIcon ICON_CLOSE = Util.createImageIcon("/resources/close.png");
