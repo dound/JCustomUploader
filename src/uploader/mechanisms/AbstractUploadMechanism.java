@@ -53,6 +53,7 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
 
     protected void haltWithError(String err) {
         this.err = err;
+        offset = -1;
         closeFile();
         uploadCanceled();
         this.currentUploadFile = null;
@@ -140,6 +141,12 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
         }
 
         if(this.isUploadComplete()) {
+            if(!finalizeUpload()) {
+                if(err==null)
+                    haltWithError("couldn't finalize"); // generic error if the subclass didn't set one
+                return -1;
+            }
+
             closeFile();
             this.currentUploadFile = null;
             err = null;
@@ -177,6 +184,12 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
      * @return true if the bytes were successfully uploaded
      */
     protected abstract boolean tryToUploadNextChunk(byte[] buf, int len);
+
+    /**
+     * Called when all bytes have been successfully sent.
+     * @return true if the upload has succeeded
+     */
+    protected boolean finalizeUpload() { return true; }
 
     /** Called when an upload is halted or canceled. */
     protected void uploadCanceled() {}
