@@ -48,7 +48,7 @@ public class TestUploadMechanism extends AbstractUploadMechanism {
 
     public long tryToUploadNextChunk(long numBytesToUpload) {
         if(rand.nextFloat() < chanceNextChunkFails) {
-            haltWithError("random chunk upload failure");
+            haltWithError("random upload failure");
             return -1;
         }
         else {
