@@ -8,7 +8,9 @@ import java.io.IOException;
 
 /**
  * A skeleton UploadMechanism implementation.  Override tryToStartUpload() and
- * tryToUploadNextChunk() to complete the implementation.
+ * tryToUploadNextChunk() to complete the implementation.  uploadCanceled()
+ * should also be overridden if anything needs to happen when an upload is
+ * halted before it completes.
  *
  * @author David Underhill
  */
@@ -31,7 +33,7 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
         this.buffer = new byte[buf_sz];
     }
 
-    public void cancelUpload() {
+    public final void cancelUpload() {
         haltWithError("canceled");
     }
 
@@ -52,6 +54,7 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
     protected void haltWithError(String err) {
         this.err = err;
         closeFile();
+        uploadCanceled();
         this.currentUploadFile = null;
     }
 
@@ -174,4 +177,7 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
      * @return true if the bytes were successfully uploaded
      */
     protected abstract boolean tryToUploadNextChunk(byte[] buf, int len);
+
+    /** Called when an upload is halted or canceled. */
+    protected void uploadCanceled() {}
 }
