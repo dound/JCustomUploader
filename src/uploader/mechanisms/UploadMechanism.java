@@ -14,9 +14,9 @@ package uploader.mechanisms;
 public interface UploadMechanism {
     /**
      * Called once for each file which is to be uploaded.  Initiates the upload.
-     * @return true if the initialization to start the upload succeeded
+     * @return -1 on error; otherwise it returns the size of the file
      */
-    public boolean startUpload(String fn);
+    public long startUpload(String fn);
 
     /**
      * Called until this method returns false or isUploadComplete() returns
@@ -43,9 +43,7 @@ public interface UploadMechanism {
 
     /**
      * Gets a human-readable string describing the most recent error, if any.
+     * Returns null if there is no error.
      */
     public String getErrorText();
-
-    /** Gets the number of bytes to be uploaded for the current file. */
-    public long getSizeOfCurrentUpload();
 }

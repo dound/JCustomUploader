@@ -127,13 +127,13 @@ public class UploadManager {
             }
 
             // initialize the upload process
-            if(!uploadMech.startUpload(item.getFilename())) {
+            long actualSize = uploadMech.startUpload(item.getFilename());
+            if(actualSize < 0) {
                 cancelCurrentUpload(uploadMech.getErrorText());
                 return;
             }
 
             // check the file size just in case it changed since the user added it
-            long actualSize = uploadMech.getSizeOfCurrentUpload();
             if(item.length() != actualSize) {
                 long diff = actualSize - item.length();
                 item.setItemSize(actualSize);

@@ -1,6 +1,5 @@
 package uploader.mechanisms;
 
-import java.io.File;
 import java.util.Random;
 
 
@@ -10,16 +9,11 @@ import java.util.Random;
  *
  * @author David Underhill
  */
-public class TestUploadMechanism implements UploadMechanism {
+public class TestUploadMechanism extends AbstractUploadMechanism {
     private final Random rand;
     private long chunkXferTime_ms;
     private double chanceStartFails;
     private double chanceNextChunkFails;
-
-    private String currentUpload = null;
-    private long sz = 0;
-    private long offset = 0;
-    private String err = "";
 
     /**
      * Constructs a test upload mechanism with the specified failure chances
@@ -44,77 +38,22 @@ public class TestUploadMechanism implements UploadMechanism {
         this.rand = new Random(seed);
     }
 
-    public void cancelUpload() {
-        haltWithError("canceled");
-    }
-
-    public String getErrorText() {
-        return err;
-    }
-
-    public long getSizeOfCurrentUpload() {
-        return sz;
-    }
-
-    public boolean isUploadComplete() {
-        return sz == offset;
-    }
-
-    public boolean startUpload(String fn) {
-        if(currentUpload != null) {
-            haltWithError("an upload is already in progress");
-            return false;
-        }
-
+    public long tryToStartUpload() {
         if(rand.nextFloat() < chanceStartFails) {
             haltWithError("random start failure");
-            return false;
-        }
-        else {
-            File f = new File(fn);
-            if(!f.exists()) {
-                haltWithError("does not exist: " + fn);
-                return false;
-            }
-            else if(!f.isFile()) {
-                haltWithError("not a file: " + fn);
-                return false;
-            }
-
-            currentUpload = fn;
-            offset = 0;
-            sz = f.length();
-            return true;
-        }
-    }
-
-    public long uploadNextChunk(long numBytesToUpload) {
-        if(currentUpload == null) {
-            err = "no upload is in progress";
             return -1;
         }
+        return getFileSize();
+    }
 
+    public long tryToUploadNextChunk(long numBytesToUpload) {
         if(rand.nextFloat() < chanceNextChunkFails) {
             haltWithError("random chunk upload failure");
             return -1;
         }
         else {
-            long max = sz - offset;
-            long actualNumBytesToUpload = Math.min(max, numBytesToUpload);
-            offset += actualNumBytesToUpload;
-            if(actualNumBytesToUpload > 0) {
-                try { Thread.sleep(this.chunkXferTime_ms); } catch(InterruptedException e) {}
-            }
-            if(this.isUploadComplete()) {
-                this.currentUpload = null;
-                err = "upload successful (no error)";
-            }
-            return actualNumBytesToUpload;
+            try { Thread.sleep(this.chunkXferTime_ms); } catch(InterruptedException e) {}
+            return numBytesToUpload;
         }
-    }
-
-    private void haltWithError(String err) {
-        this.err = err;
-        this.currentUpload = null;
     }
 }
