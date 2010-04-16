@@ -222,7 +222,7 @@ public class UploadItem extends JPanel {
      *
      * Thread-safe (volatile variable and asynchronously updates UI from Swing EDT).
      */
-    public void setNumBytesUploaded(long n) {
+    public void setNumBytesUploaded(final long n) {
         numBytesUploaded = n;
         final UploadItem me = this;
         SwingUtilities.invokeLater(new Runnable() {
@@ -234,7 +234,10 @@ public class UploadItem extends JPanel {
                     setProgressTextDirectly("uploaded!", false);
                 }
                 else {
-                    setProgressTextDirectly(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded", false);
+                    if(n > 0)
+                        setProgressTextDirectly(SZ_FMT.format(100*getPercentUploaded()) + "% uploaded", false);
+                    else
+                        setProgressTextDirectly("will retry", false);
                 }
                 me.repaint();
             }
