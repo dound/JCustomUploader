@@ -10,7 +10,9 @@ import java.io.IOException;
  * A skeleton UploadMechanism implementation.  Override tryToStartUpload() and
  * tryToUploadNextChunk() to complete the implementation.  uploadCanceled()
  * should also be overridden if anything needs to happen when an upload is
- * halted before it completes.
+ * halted before it completes.  finalizeUpload() should also be overridden if
+ * your mechanism needs to do anything after you've uploaded the last of the
+ * file (e.g., upload a trailer or check the server's response).
  *
  * @author David Underhill
  */
