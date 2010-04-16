@@ -1,6 +1,14 @@
 Java Custom Uploader
 =
 
+__About__: A simple, Java-based file uploader with a clean UI.  It can run as an
+applet on your website (Java 1.5 or higher) or as part of a desktop application.
+
+The upload logic is pluggable, so you can either write your own (upload over any
+protocol you want!) or use one of the included upload mechanisms (e.g., HTTP).
+The uploader handles automatically parallelizing uploads and providing the user
+with feedback in the case of an error.
+
 Problem?  Please report it on the [JCustomUploader issues
 page](http://github.com/dound/JCustomUploader/issues).
 
@@ -21,6 +29,7 @@ Advantages
     - Test (uploads nowhere - useful for testing)
   * __Parallel Uploads__: Multiple uploads can be sent in parallel - you can
     choose how many uploads will be done at once.
+  * __Java 1.5__: Only needs Java 1.5 (aka Java 5) or higher to run.
 
 
 Limitations
