@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import uploader.util.Util;
@@ -77,6 +78,7 @@ public class UploadItem extends JPanel {
         add(Box.createHorizontalGlue());
         Dimension lblProgressDim = new Dimension(175, lblSzDim.height);
         Util.setSize(lblProgress, lblProgressDim);
+        lblProgress.setHorizontalTextPosition(SwingConstants.LEFT);
         add(lblProgress);
         add(Box.createRigidArea(new Dimension(5, 0)));
 
