@@ -185,6 +185,13 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
     }
 
     /**
+     * Returns the object used to get the file for upload.
+     */
+    protected UploadFileGetter getUploadFileGetter() {
+        return fileGetter;
+    }
+
+    /**
      * Sets the object which will be used to get the file for upload.  The
      * default file getter simply returns the file itself (buffered).  It may
      * be overridden if some pre-processing should be done to the file.

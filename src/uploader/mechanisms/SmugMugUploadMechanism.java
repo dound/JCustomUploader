@@ -141,7 +141,10 @@ public class SmugMugUploadMechanism extends HTTPUploadMechanism {
         String xsmugfn = "X-Smug-FileName: " + f.getName() + "\r\n";
         String md5;
         try {
-            md5 = Util.md5(f);
+            // we could do this slightly more efficiently if we cached the
+            // resized picture's bytes (or computed the MD5 up front) but that
+            // would require coupling this more tightly to the UploadFileGetter.
+            md5 = Util.md5( this.getUploadFileGetter().getInputStream(f).a );
         }
         catch(Exception e) {
             // send it without the md5 sum if we can't compute it

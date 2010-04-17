@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -54,12 +51,11 @@ public final class Util {
     }
 
     /**
-     * Returns the hex string representing the MD5 of the specified file f.  An
-     * exception is thrown if the value cannot be computed.
+     * Returns the hex string representing the MD5 of the specified input
+     * stream.  An exception is thrown if the value cannot be computed.
      */
-    public static final String md5(File f) throws NoSuchAlgorithmException, FileNotFoundException, IOException {
+    public static final String md5(InputStream is) throws NoSuchAlgorithmException, IOException {
         MessageDigest digest = MessageDigest.getInstance("MD5");
-        InputStream is = new FileInputStream(f);
         byte[] buffer = new byte[4096];
         int read = 0;
         while((read = is.read(buffer)) > 0) {
