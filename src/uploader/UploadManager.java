@@ -146,6 +146,19 @@ public class UploadManager {
             long bytesUploaded = 0;
             long totalBytesUploaded = 0;
             while(item!=null) {
+                // If this should be our last chunk, optimistically update the
+                // GUI.  Otherwise, it may look like the upload stalled at X%
+                // (though it hasn't) while we wait for the server's response.
+                if(actualSize-totalBytesUploaded < CHUNK_SIZE) {
+                    final UploadItem tmp = item;
+                    SwingUtilities.invokeLater(new Runnable() {
+                       public void run() {
+                           tmp.setProgressText("finalizing ...", false);
+                           tmp.repaint();
+                       }
+                    });
+                }
+
                 // upload the next chunk of this item
                 bytesUploaded = uploadMech.uploadNextChunk(CHUNK_SIZE);
                 if(bytesUploaded == -1L) {
