@@ -18,6 +18,7 @@ import java.io.IOException;
  */
 public abstract class AbstractUploadMechanism implements UploadMechanism {
     private BufferedInputStream currentUploadFile = null;
+    private File currentUploadFileObj = null;
     private long sz = 0;
     private long offset = 0;
     private String err = null;
@@ -58,7 +59,8 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
         offset = -1;
         closeFile();
         uploadCanceled();
-        this.currentUploadFile = null;
+        currentUploadFile = null;
+        currentUploadFileObj = null;
     }
 
     public final boolean isUploadComplete() {
@@ -88,6 +90,7 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
             haltWithError("not a file: " + fn);
             return -1;
         }
+        currentUploadFileObj = f;
 
         // open the file
         try {
@@ -150,7 +153,8 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
             }
 
             closeFile();
-            this.currentUploadFile = null;
+            currentUploadFile = null;
+            currentUploadFileObj = null;
             err = null;
         }
         return actualBytes;
@@ -159,6 +163,14 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
     /** returns the offset of the next byte to send */
     protected long getOffset() {
         return offset;
+    }
+
+    /**
+     * Returns the File object associated with the file currently being uploaded
+     * or null if no upload is in progress.
+     */
+    public final File getFile() {
+        return currentUploadFileObj;
     }
 
     /** returns the size of the file being uploaded (0 if none) */
