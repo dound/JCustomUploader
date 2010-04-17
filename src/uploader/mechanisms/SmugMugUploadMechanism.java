@@ -36,7 +36,7 @@ public class SmugMugUploadMechanism extends HTTPUploadMechanism {
     private static final int PORT = 80;
     private static final String METHOD = "POST";
     private static final String PATH = "/photos/xmlrawadd.mg";
-    private static final String HEADERS = "Host: " + HOST + "\r\nX-Smug-Response: REST\r\nX-Smug-Version: 1.2.2\r\n";
+    private static final String HEADERS = "Host: " + HOST + "\r\nX-Smug-Response: REST\r\nX-Smug-Version: 1.2.2\r\nUser-Agent: JCustomUploader\r\n";
 
     /** OAuth parameters (null if authentication is being done via sessions */
     private final String apiKey, consumerSecret, accessToken, accessTokenSecret;
