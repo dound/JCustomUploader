@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -20,11 +21,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import uploader.UploaderPanel;
 import uploader.mechanisms.SmugMugUploadMechanism;
+import uploader.mechanisms.event.ScaledImageGetter;
 import uploader.mechanisms.event.SmugMugUploadListener;
 import uploader.util.ImageFileFilter;
 
@@ -47,22 +50,23 @@ public class BasicSmugMugUploader extends JFrame {
     /** SmugMug session ID which authenticates the user as logged in */
     private String sessionID;
 
-    final JPanel pnlLogin = new JPanel();
-    final JPanel pnlAlbum = new JPanel();
-    final JComboBox cboAlbums = new JComboBox();
+    /** maximum image size (<=0 if no limit) */
+    private int maxPhotoSideLength = 0;
+
+    /** stores a list of Albums in the user's account */
+    private final JComboBox cboAlbums = new JComboBox();
 
     public BasicSmugMugUploader() {
         setTitle("JCustomUploader Demo: Uploading to SmugMug");
         setBackground(Color.WHITE);
 
-        initLoginPanel();
-        initAlbumPanel();
-        add(pnlLogin);
+        add(initLoginPanel());
         pack();
     }
 
     /** build the UI components for the login panel */
-    private void initLoginPanel() {
+    private JPanel initLoginPanel() {
+        final JPanel pnlLogin = new JPanel();
         pnlLogin.setBackground(Color.WHITE);
         pnlLogin.setLayout(new BoxLayout(pnlLogin, BoxLayout.Y_AXIS));
         pnlLogin.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -109,7 +113,7 @@ public class BasicSmugMugUploader extends JFrame {
                         cboAlbums.addItem(a);
 
                     BasicSmugMugUploader.this.remove(pnlLogin);
-                    BasicSmugMugUploader.this.add(pnlAlbum);
+                    BasicSmugMugUploader.this.add(initAlbumPanel());
                     BasicSmugMugUploader.this.pack();
                 }
                 else {
@@ -128,10 +132,12 @@ public class BasicSmugMugUploader extends JFrame {
                 btnLogin.doClick();
             }
         });
+        return pnlLogin;
     }
 
     /** build the UI components for the album picker panel */
-    private void initAlbumPanel() {
+    private JPanel initAlbumPanel() {
+        final JPanel pnlAlbum = new JPanel();
         pnlAlbum.setBackground(Color.WHITE);
         pnlAlbum.setLayout(new BoxLayout(pnlAlbum, BoxLayout.Y_AXIS));
         pnlAlbum.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -139,19 +145,54 @@ public class BasicSmugMugUploader extends JFrame {
         final JPanel pnlForm = new JPanel();
         pnlForm.setOpaque(false);
         pnlForm.setLayout(new BoxLayout(pnlForm, BoxLayout.X_AXIS));
-        pnlAlbum.add(pnlForm);
-
+        pnlForm.setAlignmentX(LEFT_ALIGNMENT);
         final JLabel lblAlbum = new JLabel("Album:");
         pnlForm.add(lblAlbum);
-
         pnlForm.add(Box.createRigidArea(new Dimension(10,0)));
-
         pnlForm.add(cboAlbums);
+        pnlAlbum.add(pnlForm);
 
         pnlAlbum.add(Box.createRigidArea(new Dimension(0,15)));
 
+        // UI for letting the user choose to resize images before uploading if desired
+        final JPanel pnlSizer = new JPanel();
+        pnlSizer.setOpaque(false);
+        pnlSizer.setLayout(new BoxLayout(pnlSizer, BoxLayout.Y_AXIS));
+        pnlSizer.setAlignmentX(LEFT_ALIGNMENT);
+        pnlAlbum.add(pnlSizer);
+
+        final JLabel lblSizer = new JLabel("Image Resizing:");
+        lblSizer.setAlignmentX(LEFT_ALIGNMENT);
+        pnlSizer.add(lblSizer);
+
+        final JRadioButton optNoLimit = new JRadioButton("Don't resize my images");
+        optNoLimit.setOpaque(false);
+        optNoLimit.setAlignmentX(LEFT_ALIGNMENT);
+        optNoLimit.setSelected(true);
+        pnlSizer.add(optNoLimit);
+
+        final JPanel pnlMaxLength = new JPanel();
+        pnlMaxLength.setOpaque(false);
+        pnlMaxLength.setLayout(new BoxLayout(pnlMaxLength, BoxLayout.X_AXIS));
+        pnlMaxLength.setAlignmentX(LEFT_ALIGNMENT);
+        pnlSizer.add(pnlMaxLength);
+        final JRadioButton optResize = new JRadioButton("Maximum side length: ");
+        optResize.setOpaque(false);
+        optResize.setAlignmentX(LEFT_ALIGNMENT);
+        pnlMaxLength.add(optResize);
+        final JTextField txtMaxLength = new JTextField();
+        txtMaxLength.setMaximumSize(new Dimension(50, txtMaxLength.getMaximumSize().height));
+        txtMaxLength.setEnabled(false);
+        pnlMaxLength.add(txtMaxLength);
+
+        final ButtonGroup optionGroup = new ButtonGroup();
+        optionGroup.add(optNoLimit);
+        optionGroup.add(optResize);
+
+        pnlAlbum.add(Box.createRigidArea(new Dimension(0,15)));
+
+        // the button to show the uploader
         final JButton btnPickAlbum = new JButton("Pick photos to upload to this album");
-        btnPickAlbum.setAlignmentX(CENTER_ALIGNMENT);
         pnlAlbum.add(btnPickAlbum);
         btnPickAlbum.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -159,11 +200,42 @@ public class BasicSmugMugUploader extends JFrame {
                 btnPickAlbum.setEnabled(false);
                 Album a = (Album)cboAlbums.getSelectedItem();
                 if(a != null) {
+                    // determine the max side length of photos, if any
+                    try {
+                        if(optNoLimit.isSelected())
+                            maxPhotoSideLength = -1; // no limit
+                        else {
+                            int v = Integer.valueOf(txtMaxLength.getText());
+                            if(v <= 0)
+                                throw new Exception("bad side length (must be greater than 0)");
+                            maxPhotoSideLength = v;
+                        }
+                    }
+                    catch(Exception ex) {
+                        JOptionPane.showMessageDialog(btnPickAlbum, ex.getMessage());
+                        btnPickAlbum.setEnabled(true);
+                        return;
+                    }
+
+                    // go to the uploader panel
                     BasicSmugMugUploader.this.remove(pnlAlbum);
                     BasicSmugMugUploader.this.add(initUploaderPanel(a.id));
                 }
             }
         });
+        optNoLimit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                txtMaxLength.setText("");
+                txtMaxLength.setEnabled(false);
+            }
+        });
+        optResize.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                txtMaxLength.setEnabled(true);
+                txtMaxLength.requestFocus();
+            }
+        });
+        return pnlAlbum;
     }
 
     /** fetch a URL */
@@ -239,8 +311,11 @@ public class BasicSmugMugUploader extends JFrame {
     private UploaderPanel initUploaderPanel(String albumID) {
         final int NUM_THREADS = 3;
         final SmugMugUploadMechanism[] uploadMechs = new SmugMugUploadMechanism[NUM_THREADS];
+        final ScaledImageGetter fileGetter = (maxPhotoSideLength>0) ? new ScaledImageGetter(100) : null;
         for(int i=0; i<NUM_THREADS; i++) {
             uploadMechs[i] = new SmugMugUploadMechanism(albumID, sessionID);
+            if(fileGetter != null)
+                uploadMechs[i].setUploadFileGetter(fileGetter);
 
             // print the image ID/key/URL to show how to get these as photos are uploaded to SmugMug
             uploadMechs[i].setSmugMugEventListener(new SmugMugUploadListener() {
