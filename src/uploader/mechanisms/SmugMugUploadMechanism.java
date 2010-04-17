@@ -84,7 +84,7 @@ public class SmugMugUploadMechanism extends HTTPUploadMechanism {
 
     // regular expressions for parsing out some info from SmugMug's responses
     private static final Pattern RE_RESP_STAT  = Pattern.compile("<rsp stat=\"([^\"]+)\">");
-    private static final Pattern RE_RESP_ERR   = Pattern.compile("msg=\"(.+)\"");
+    private static final Pattern RE_RESP_ERR   = Pattern.compile("msg=\"([^\"]+)\"");
     private static final Pattern RE_RESP_DATA  = Pattern.compile("<Image id=\"([^\"]+)\" Key=\"([^\"]+)\" URL=\"([^\"]+)\"/>");
 
     /**
