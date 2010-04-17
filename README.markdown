@@ -4,16 +4,24 @@ Java Custom Uploader
 __About__: A simple, Java-based file uploader with a clean UI.  It can run as an
 applet on your website (Java 1.5 or higher) or as part of a desktop application.
 
-The upload logic is pluggable, so you can either write your own (upload over any
-protocol you want!) or use one of the included upload mechanisms (e.g., HTTP).
-The uploader handles automatically parallelizing uploads and providing the user
-with feedback in the case of an error.
+The upload logic is pluggable, so you can use one of the included upload
+mechanisms (e.g., HTTP) _or roll your own_ to upload via whatever protocol you
+need.  The uploader handles automatically parallelizing uploads and providing
+the user with feedback in the case of an error.
+
+__Demo__: Several examples have been put together:
+
+  1. An applet running the uploader will be posted soon.
+  1. A [basic SmugMug uploader](http://github.com/dound/JCustomUploader/blob/master/src/uploader/demo/BasicSmugMugUploader.java)
+     has been put together to demonstrate the uploader being used as part of a larger application.
+  1. Check out the example at the bottom of this document.
+
 
 Problem?  Please report it on the [JCustomUploader issues
 page](http://github.com/dound/JCustomUploader/issues).
 
 
-Advantages
+Features
 -
   * __Clean, Functional UI__: The user can select multiple files at a time or
     even folders.  Uploads can be canceled at any time, or retried if they
@@ -23,12 +31,14 @@ Advantages
     means you like.  You just extend [AbstractUploadMechanism](http://github.com/dound/JCustomUploader/blob/master/src/uploader/mechanisms/AbstractUploadMechanism.java)
     which specifies how to start an upload and send a chunk of data.
     JCustomUploader handles getting the data to you, canceling uploads, and
-    performing multiple uploads in parallel.  It comes with several such mechanisms:
+    performing multiple uploads in parallel.  It comes with several built-in
+    mechanisms:
     - HTTP (raw binary data)
     - HTTP (multipart/form-data encoded)
+    - SmugMug API (with OAuth or SmugMug sessions)
     - Test (uploads nowhere - useful for testing)
-  * __Parallel Uploads__: Multiple uploads can be sent in parallel - you can
-    choose how many uploads will be done at once.
+  * __Parallel Uploads__: Multiple uploads can be sent in parallel - you just
+    specify the maximum number to try at once and JCustomUploader does the rest.
   * __Java 1.5__: Only needs Java 1.5 (aka Java 5) or higher to run.
 
 
@@ -36,21 +46,19 @@ Limitations
 -
   * The provided text is in English with no easy hook to provide a custom
     translation.
-  * Primarily intended to interact with a user, not a program (there aren't many
-    hooks for you to pragmatically stop an upload, etc.).
+  * Primarily intended to interact with a user, not a program (e.g., there is
+    not great support for pragmatically stop an upload, etc.).
 
 
 Usage
 -
-First download and unpack JCustomUploader.  See UploaderApplet.java's
-createGUI() method for an example of how to initialize the uploader (whether or
-not you use it in an applet).  In particular, the arguments to UploaderPanel()
-are used to customize how JCustomUploader works for you:
+First download and unpack JCustomUploader.  To use the uploader, you will need
+to instantiate an UploaderPanel.  With its constructor you specify:
 
   - How to upload files and how many uploads to perform in parallel.
-  - How text in the UI refers to what your uploading, e.g., "photo" or "item".
-  - What kinds of files may be selected:
+  - What kinds of files may be selected.
   - Whether to show a preview of the selected file (only for images).
+  - How text in the UI refers to what you are uploading, e.g., "photo" or "item".
 
 
 **Using it as an Applet:**
@@ -65,26 +73,22 @@ are used to customize how JCustomUploader works for you:
 
   1. Either reference the jar containing the JCustomUploader or copy the code
      into your source folder.
-  1. Create an UploaderPanel() (as above) and display it in a dialog or some
-     other Swing container.
+  1. Create an UploaderPanel (as above) and display it in a dialog or some
+     other Swing container.  [BasicSmugMugUploader](http://github.com/dound/JCustomUploader/blob/master/src/uploader/demo/BasicSmugMugUploader.java)
+     demonstrates this approach (for details, see its documentation).
 
 
 Example Usage
 -
-
-This example uploader uses three threads and only lets the user upload images.
-A test upload mechanism which just pretends to upload files is used here for
-demonstration purposes.
+This example uploader uses three threads and only lets the user upload images:
 
     // obviously you'll want to do this in a method on your applet/application
 
-    // Build the uploaders (the test uploader is configured here to fail to
-    // start uploading 20% of files and fail in the midst of "sending" a piece
-    // of a file 1% of the time - this is to demo how failures are handled.)
+    // Build the uploaders to upload to http://127.0.0.1/upload/ using HTTP POST.
     final int NUM_THREADS = 3;
     final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
     for(int i=0; i<NUM_THREADS; i++)
-        uploadMechs[i] = new TestUploadMechanism(250, 0.2, 0.01, System.currentTimeMillis()+i*100);
+        uploadMechs[i] = new HTTPUploadMechanism("127.0.0.1", "/upload/");
 
     // just use the width which the applet was given
     int width = getWidth();
@@ -104,5 +108,5 @@ demonstration purposes.
 
 
 _Author_: [David Underhill](http://www.dound.com)  
-_Release Date_: 2010-Apr-15 (v1.00)  
+_Release Date_: 2010-Apr-17 (pre-release)  
 _License_: Apache License Version 2.0  
