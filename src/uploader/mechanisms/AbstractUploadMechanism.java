@@ -2,9 +2,11 @@ package uploader.mechanisms;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+
+import uploader.mechanisms.event.UploadFileGetter;
+import uploader.util.Pair;
 
 /**
  * A skeleton UploadMechanism implementation.  Override tryToStartUpload() and
@@ -22,6 +24,9 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
     private long sz = 0;
     private long offset = 0;
     private String err = null;
+
+    /** object which handles getting the file */
+    private UploadFileGetter fileGetter = new UploadFileGetter();
 
     /** buffer to store file data */
     private final byte[] buffer;
@@ -94,14 +99,15 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
 
         // open the file
         try {
-            currentUploadFile = new BufferedInputStream(new FileInputStream(f));
-        } catch(FileNotFoundException e) {
+            Pair<InputStream, Long> ret = fileGetter.getInputStream(f);
+            currentUploadFile = new BufferedInputStream(ret.a);
+            sz = ret.b;
+        } catch(IOException e) {
             haltWithError(e.getMessage());
             return -1;
         }
 
         offset = 0;
-        sz = f.length();
         err = null;
 
         if(!tryToStartUpload(f)) {
@@ -176,6 +182,15 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
     /** returns the size of the file being uploaded (0 if none) */
     protected long getFileSize() {
         return sz;
+    }
+
+    /**
+     * Sets the object which will be used to get the file for upload.  The
+     * default file getter simply returns the file itself (buffered).  It may
+     * be overridden if some pre-processing should be done to the file.
+     */
+    public void setUploadFileGetter(UploadFileGetter fileGetter) {
+        this.fileGetter = fileGetter;
     }
 
     /**
