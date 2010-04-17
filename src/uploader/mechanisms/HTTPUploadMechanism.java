@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import uploader.mechanisms.event.HTTPUploadListener;
+
 /**
  * Uploads files using HTTP/1.0.  Files can be uploaded as raw binary data or
  * encoded as multipart/form-data.  An optional custom header
@@ -26,6 +28,9 @@ public class HTTPUploadMechanism extends AbstractUploadMechanism {
 
     /** whether to encode the file as multipart/form-data */
     private final String multipartFormDataField;
+
+    /** an object (if any) to notify whenever a response completes */
+    private volatile HTTPUploadListener eventListener = null;
 
     /**
      * The boundary to use: if it overlaps with any data in the file, then it
@@ -181,8 +186,22 @@ public class HTTPUploadMechanism extends AbstractUploadMechanism {
                 int code = Integer.valueOf(strCode);
                 if(code>=200 && code<300) {
                     // be nice and read the rest of their response
+                    HTTPUploadListener listener = eventListener;
+                    String resp = "";
                     while(n > 0) {
+                        if(listener != null)
+                            resp += new String(buf, 0, n); // only save the response if have to share it
                         n = sock.getInputStream().read(buf, 0, 1024);
+                    }
+
+                    // if something is listening, fire an event to let them know about the response
+                    if(listener != null) {
+                        String errMsg = listener.responseReceived(this, code, resp);
+                        if(errMsg != null) {
+                            // something in the response indicated a failure ...
+                            haltWithError(errMsg);
+                            return false;
+                        }
                     }
                     return true;
                 }
@@ -210,5 +229,22 @@ public class HTTPUploadMechanism extends AbstractUploadMechanism {
         try { if(sock!=null) sock.close(); } catch (IOException e) {}
         out = null;
         sock = null;
+    }
+
+    /** gets the object listening for upload events (may be null) */
+    public HTTPUploadListener getEventListener() {
+        return eventListener;
+    }
+
+    /**
+     * Sets the object to be notified of upload events (responses).  Note that
+     * callbacks will be issued from an upload thread NOT the Swing EDT.  Use
+     * SwingUtilities.invokeLater() if you need to run on the EDT.
+     *
+     * This method is thread-safe (i.e., you can set the event listener from
+     * any thread).
+     */
+    public void setEventListener(HTTPUploadListener l) {
+        eventListener = l;
     }
 }
