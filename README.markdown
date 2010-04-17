@@ -37,6 +37,11 @@ Features
     - HTTP (multipart/form-data encoded)
     - SmugMug API (with OAuth or SmugMug sessions)
     - Test (uploads nowhere - useful for testing)
+  * __Custom Hooks__: You can register for callbacks which allow you to
+    pre-process files before uploading them or do some extra processing on the
+    server's response to each upload.
+    - A pre-processor for images which resizes them before uploading them is
+      included.  The example below demonstrates how to use this component.
   * __Parallel Uploads__: Multiple uploads can be sent in parallel - you just
     specify the maximum number to try at once and JCustomUploader does the rest.
   * __Java 1.5__: Only needs Java 1.5 (aka Java 5) or higher to run.
@@ -47,7 +52,8 @@ Limitations
   * The provided text is in English with no easy hook to provide a custom
     translation.
   * Primarily intended to interact with a user, not a program (e.g., there is
-    not great support for pragmatically stop an upload, etc.).
+    not great support for pragmatically stop an upload, etc.).  The applet does
+    not expose any hooks which can be called by JavaScript.
 
 
 Usage
@@ -87,8 +93,13 @@ This example uploader uses three threads and only lets the user upload images:
     // Build the uploaders to upload to http://127.0.0.1/upload/ using HTTP POST.
     final int NUM_THREADS = 3;
     final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
-    for(int i=0; i<NUM_THREADS; i++)
+    int maxSideLen = 1024;
+    for(int i=0; i<NUM_THREADS; i++) {
         uploadMechs[i] = new HTTPUploadMechanism("127.0.0.1", "/upload/");
+
+        // override the default which just sends the file as-is
+        uploadMechs[i].setUploadFileGetter(new ScaledImageGetter(maxSideLen));
+    }
 
     // just use the width which the applet was given
     int width = getWidth();
