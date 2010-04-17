@@ -128,7 +128,10 @@ public class SmugMugUploadMechanism extends HTTPUploadMechanism {
     protected String getAdditionalHeaders(File f) {
         String oauthHeaderIfNeeded;
         try {
-            oauthHeaderIfNeeded = makeOAuthHeaders();
+            if(apiKey != null)
+                oauthHeaderIfNeeded = makeOAuthHeaders();  // using oauth
+            else
+                oauthHeaderIfNeeded = "";                 // using sessions
         }
         catch(Exception e) {
             haltWithError(e.getMessage());
