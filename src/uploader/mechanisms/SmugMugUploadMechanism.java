@@ -53,7 +53,7 @@ public class SmugMugUploadMechanism extends HTTPUploadMechanism {
      * @param extraHeaders  optional additional headers (e.g., X-Smug-Keywords)
      */
     public SmugMugUploadMechanism(String albumID, String sessionID, String extraHeaders) {
-        this(albumID, "X-Smug-SessionID: " + sessionID + "\r\n"+extraHeaders, null, null, null, null);
+        this(albumID, null, null, null, null, "X-Smug-SessionID: " + sessionID + "\r\n"+extraHeaders);
     }
     public SmugMugUploadMechanism(String albumID, String sessionID) {
         this(albumID, sessionID, "");
