@@ -117,7 +117,6 @@ public class UploaderPanel extends JPanel {
                 FC.setAccessory(previewAccessory);
                 int ret = FC.showDialog(btnAddImages, "Upload");
                 if(ret == JFileChooser.APPROVE_OPTION) {
-                    // TODO: remove these example entries
                     for(File f : FC.getSelectedFiles()) {
                         uploader.addFileToUpload(f);
                     }
