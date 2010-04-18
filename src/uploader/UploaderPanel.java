@@ -1,13 +1,16 @@
 package uploader;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -17,11 +20,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
 import uploader.mechanisms.UploadMechanism;
+import uploader.util.FileDrop;
 import uploader.util.ImagePreviewAccessory;
 import uploader.util.Util;
 
@@ -65,6 +70,8 @@ public class UploaderPanel extends JPanel {
     private final JButton btnClearCompleted = new JButton("Clear completed uploads", ICON_CLEAR);
     private final UploadManager uploader;
     private boolean uploadingEnabled = true;
+    private final FileDrop dropHandler;
+    private JLabel lblDragNDropTip;
 
     public UploaderPanel(int width, UploadMechanism[] uploadMechs) {
         this(width, uploadMechs, "item", null, true);
@@ -97,8 +104,46 @@ public class UploaderPanel extends JPanel {
         add(create_upload_list());
         add(create_footer_panel(width));
 
+        if(FileDrop.supportsDnD()) {
+            // show a tip in the upload list box to let users know drag 'n drop is an option
+            lblDragNDropTip = new JLabel("\nYou may also drag files here!", SwingUtilities.CENTER);
+            lblDragNDropTip.setFont(new Font(lblDragNDropTip.getFont().getName(), Font.BOLD | Font.ITALIC, 24));
+            lblDragNDropTip.setForeground(Color.BLUE);
+            pnlUploadList.add(lblDragNDropTip, BorderLayout.CENTER);
+
+            dropHandler = new FileDrop(pnlUploadList,
+                    BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED),
+                    new FileDrop.Listener() {
+                        public void filesDropped(File[] files) {
+                            for(File f: files) {
+                                addFileIfOK(f);
+                            }
+                        }
+                    });
+        }
+        else {
+            pnlUploadList.setLayout(new BoxLayout(pnlUploadList, BoxLayout.Y_AXIS));
+            dropHandler = null;
+            lblDragNDropTip = null;
+        }
+
         uploader = new UploadManager(this, itemType, uploadMechs);
         uploader.start();
+    }
+
+    /** asks the uploader to upload a file if it meets the FileFilter */
+    private void addFileIfOK(File f) {
+        if(!f.isDirectory() && (fileFilter==null || fileFilter.accept(f))) {
+            // hide the help drag 'n drop tip after a file is added
+            if(lblDragNDropTip != null) {
+                pnlUploadList.remove(lblDragNDropTip);
+                lblDragNDropTip = null;
+                pnlUploadList.setLayout(new BoxLayout(pnlUploadList, BoxLayout.Y_AXIS));
+                pnlUploadList.repaint();
+            }
+
+            uploader.addFileToUpload(f);
+        }
     }
 
     private JPanel create_commands_panel() {
@@ -118,7 +163,7 @@ public class UploaderPanel extends JPanel {
                 int ret = FC.showDialog(btnAddImages, "Upload");
                 if(ret == JFileChooser.APPROVE_OPTION) {
                     for(File f : FC.getSelectedFiles()) {
-                        uploader.addFileToUpload(f);
+                        addFileIfOK(f);
                     }
                 }
             }
@@ -138,9 +183,7 @@ public class UploaderPanel extends JPanel {
                 if(ret == JFileChooser.APPROVE_OPTION) {
                     for(File dir : FC.getSelectedFiles()) {
                         for(File f : dir.listFiles()) {
-                            if(!f.isDirectory() && fileFilter.accept(f)) {
-                                uploader.addFileToUpload(f);
-                            }
+                            addFileIfOK(f);
                         }
                     }
                 }
@@ -176,12 +219,14 @@ public class UploaderPanel extends JPanel {
     }
 
     private JScrollPane create_upload_list() {
-        pnlUploadList.setLayout(new BoxLayout(pnlUploadList, BoxLayout.Y_AXIS));
+        pnlUploadList.setLayout(new BorderLayout());
         pnlUploadList.setBackground(BG_COLOR);
         pnlUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlUploadList.setBorder(BorderFactory.createMatteBorder( 2, 2, 2, 2, Color.BLACK));
 
         JScrollPane spUploadList = new JScrollPane(pnlUploadList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         spUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
+        spUploadList.setBorder(null);
         return spUploadList;
     }
 
@@ -291,5 +336,10 @@ public class UploaderPanel extends JPanel {
         }
         else
             btnRetryFailed.setVisible(false);
+    }
+
+    public void makeDropTarget(final UploadItem item) {
+        if(dropHandler != null)
+            dropHandler.makeDropTarget(item);
     }
 }

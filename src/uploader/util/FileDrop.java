@@ -418,7 +418,7 @@ public class FileDrop
     }   // end constructor
 
 
-    private static boolean supportsDnD()
+    public static boolean supportsDnD()
     {   // Static Boolean
         if( supportsDnD == null )
         {
@@ -463,6 +463,10 @@ public class FileDrop
      }
      // END 2007-09-12 Nathan Blomquist -- Linux (KDE/Gnome) support added.
 
+    /** add a new drop target */
+    public void makeDropTarget(final java.awt.Component c) {
+        makeDropTarget(null, c, true);
+    }
 
     private void makeDropTarget( final java.io.PrintStream out, final java.awt.Component c, boolean recursive )
     {
