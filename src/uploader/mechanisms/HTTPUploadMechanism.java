@@ -183,7 +183,7 @@ public class HTTPUploadMechanism extends AbstractUploadMechanism {
             else {
                 // response starts with: "HTTP/1.0 XYZ " where XYZ is the code
                 String strCode = new String(buf, 9, 3);
-                int code = Integer.valueOf(strCode);
+                int code = Integer.parseInt(strCode);
                 if(code>=200 && code<300) {
                     // be nice and read the rest of their response
                     HTTPUploadListener listener = eventListener;
