@@ -338,7 +338,8 @@ public class UploaderPanel extends JPanel {
             btnRetryFailed.setVisible(false);
     }
 
-    public void makeDropTarget(final UploadItem item) {
+    /** add an item which can be dropped on */
+    void makeDropTarget(final UploadItem item) {
         if(dropHandler != null)
             dropHandler.makeDropTarget(item);
     }
