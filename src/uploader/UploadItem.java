@@ -15,7 +15,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
@@ -50,7 +49,7 @@ public class UploadItem extends JPanel {
     private final JLabel lblProgress = new JLabel("not yet uploaded", JLabel.RIGHT);
     private final JButton btnRemove;
 
-    public UploadItem(UploadManager uploader, final String filename, final long sizeInBytes) {
+    public UploadItem(UploadManager uploader, final String filename, final String filetitle, final long sizeInBytes) {
         this.uploader = uploader;
         this.fn = filename;
         this.szBytes = sizeInBytes;
@@ -65,15 +64,11 @@ public class UploadItem extends JPanel {
         add(Box.createRigidArea(new Dimension(15, 0)));
 
         // use a text field for filename so that long names can be scrolled to view the full name
-        JTextField txtFn = new JTextField();
-        txtFn.setText(fn);
-        txtFn.setEditable(false);
-        txtFn.setBorder(null);
-        txtFn.setHighlighter(null); // don't highlight selected text
-        txtFn.setOpaque(false);
-        Dimension lblFnDim = new Dimension(400, txtFn.getPreferredSize().height);
-        Util.setSize(txtFn, lblFnDim);
-        add(txtFn);
+        JLabel lblFn = new JLabel();
+        lblFn.setText(filetitle);
+        Dimension lblFnDim = new Dimension(400, lblFn.getPreferredSize().height);
+        Util.setSize(lblFn, lblFnDim);
+        add(lblFn);
 
         add(Box.createHorizontalGlue());
         Dimension lblProgressDim = new Dimension(175, lblSzDim.height);

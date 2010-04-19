@@ -277,7 +277,7 @@ public class UploadManager {
             return;
         }
 
-        UploadItem item = new UploadItem(this, f.getPath(), f.length());
+        UploadItem item = new UploadItem(this, f.getPath(), f.getName(), f.length());
         this.uploaderUI.makeDropTarget(item);
         Container pnlUploadItems = uploaderUI.getUploadItemsContainer();
         pnlUploadItems.add(item);
