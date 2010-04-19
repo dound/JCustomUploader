@@ -101,7 +101,8 @@ public class UploaderPanel extends JPanel {
 
         add(create_commands_panel());
         add(Box.createRigidArea(new Dimension(0, 5)));
-        add(create_upload_list());
+        final JScrollPane uploadPane = create_upload_list();
+        add(uploadPane);
         add(create_footer_panel(width));
 
         if(FileDrop.supportsDnD()) {
@@ -111,7 +112,7 @@ public class UploaderPanel extends JPanel {
             lblDragNDropTip.setForeground(Color.BLUE);
             pnlUploadList.add(lblDragNDropTip, BorderLayout.CENTER);
 
-            dropHandler = new FileDrop(pnlUploadList,
+            dropHandler = new FileDrop(uploadPane,
                     BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED),
                     new FileDrop.Listener() {
                         public void filesDropped(File[] files) {
@@ -225,11 +226,11 @@ public class UploaderPanel extends JPanel {
         pnlUploadList.setLayout(new BorderLayout());
         pnlUploadList.setBackground(BG_COLOR);
         pnlUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
-        pnlUploadList.setBorder(BorderFactory.createMatteBorder( 2, 2, 2, 2, Color.BLACK));
+        pnlUploadList.setBorder(null);
 
         JScrollPane spUploadList = new JScrollPane(pnlUploadList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         spUploadList.setAlignmentX(Component.LEFT_ALIGNMENT);
-        spUploadList.setBorder(null);
+        spUploadList.setBorder(BorderFactory.createMatteBorder( 2, 2, 2, 2, Color.BLACK));
         return spUploadList;
     }
 
