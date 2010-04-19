@@ -66,7 +66,7 @@ public class UploadItem extends JPanel {
         // use a text field for filename so that long names can be scrolled to view the full name
         JLabel lblFn = new JLabel();
         lblFn.setText(filetitle);
-        Dimension lblFnDim = new Dimension(400, lblFn.getPreferredSize().height);
+        Dimension lblFnDim = new Dimension(390, lblFn.getPreferredSize().height);
         Util.setSize(lblFn, lblFnDim);
         add(lblFn);
 
