@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="all" name="jcustomuploader">
+  <property name="debug"       value="false"/>
+  <property name="debuglevel"  value=""/>
+  <property name="target"      value="1.4"/>
+  <property name="source"      value="1.4"/>
+  <property name="bin.dir"     value="bin"/>
+  <property name="doc.dir"     value="javadocs"/>
+  <property name="jarfile"     value="jcustomuploader.jar"/>
+  <property name="jardemofile" value="jcustomuploader-demo.jar"/>
+  <property name="key"         value="jcukey"/>
+
+  <path id="classpath">
+  </path>
+
+  <target name="init">
+    <mkdir dir="bin"/>
+    <mkdir dir="bin/resources"/>
+    <copy includeemptydirs="false" todir="bin/resources">
+      <fileset dir="src/resources"/>
+    </copy>
+  </target>
+
+  <target name="clean">
+    <delete dir="${bin.dir}"/>
+    <delete dir="${doc.dir}"/>
+  </target>
+
+  <target name="build" depends="init">
+    <javac debug="${debug}"
+           debuglevel="${debuglevel}"
+           destdir="${bin.dir}"
+           source="${source}"
+           target="${target}"
+           srcdir="src"
+           excludes="uploader/demo/**">
+    </javac>
+  </target>
+
+  <target name="jar" depends="build">
+    <jar destfile="${bin.dir}/${jarfile}" filesetmanifest="mergewithoutmain">
+      <fileset dir="bin" excludes="${jarfile},${jardemofile}"/>
+    </jar>
+  </target>
+
+  <target name="keytoolexec">
+    <delete file="${key}"/>
+    <exec dir="." executable="keytool" failonerror="true">
+      <arg line="-genkeypair -keystore ${key} -storepass ${key}
+                 -keypass ${key} -validity 1095 -alias ${key}
+                 -dname 'CN=David Underhill, O=http://www.dound.com/, C=US'"/>
+    </exec>
+  </target>
+
+  <target name="jarsignerexec" depends="keytoolexec,jar">
+    <exec dir="." executable="jarsigner" failonerror="true">
+      <arg line="-keystore ${key} -storepass ${key} ${bin.dir}/${jarfile} ${key}"/>
+    </exec>
+  </target>
+
+  <target name="javadocs">
+    <javadoc access="private"
+             author="true"
+             classpath="."
+             destdir="${doc.dir}"
+             doctitle="JCustomUploader"
+             nodeprecated="false"
+             nodeprecatedlist="false"
+             noindex="false"
+             nonavbar="false"
+             notree="false"
+             overview="src/overview.html"
+             packagenames="uploader,uploader.mechanisms,uploader.util,uploader.mechanisms.event"
+             source="1.4"
+             sourcepath="src"
+             splitindex="true"
+             use="true"
+             version="true"/>
+  </target>
+
+  <target name="builddemo" depends="init">
+    <javac debug="${debug}"
+           debuglevel="${debuglevel}"
+           destdir="${bin.dir}"
+           source="${source}"
+           target="${target}"
+           srcdir="src">
+    </javac>
+  </target>
+
+  <target name="jardemo" depends="builddemo">
+    <jar destfile="${bin.dir}/${jardemofile}" filesetmanifest="mergewithoutmain">
+      <fileset dir="bin" excludes="${jarfile},${jardemofile}"/>
+    </jar>
+  </target>
+
+  <target name="demo" depends="keytoolexec,jardemo">
+    <exec dir="." executable="jarsigner" failonerror="true">
+      <arg line="-keystore ${key} -storepass ${key} ${bin.dir}/${jardemofile} ${key}"/>
+    </exec>
+  </target>
+
+  <target name="all" depends="jarsignerexec,demo,javadocs">
+    <delete file="${key}"/>
+  </target>
+</project>
