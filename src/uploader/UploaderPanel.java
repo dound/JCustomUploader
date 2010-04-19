@@ -115,8 +115,8 @@ public class UploaderPanel extends JPanel {
                     BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED),
                     new FileDrop.Listener() {
                         public void filesDropped(File[] files) {
-                            for(File f: files) {
-                                addFileIfOK(f);
+                            for(int i=0; i<files.length; i++) {
+                                addFileIfOK(files[i]);
                             }
                         }
                     });
@@ -162,8 +162,9 @@ public class UploaderPanel extends JPanel {
                 FC.setAccessory(previewAccessory);
                 int ret = FC.showDialog(btnAddImages, "Upload");
                 if(ret == JFileChooser.APPROVE_OPTION) {
-                    for(File f : FC.getSelectedFiles()) {
-                        addFileIfOK(f);
+                    File[] files = FC.getSelectedFiles();
+                    for(int i=0; i<files.length; i++) {
+                        addFileIfOK(files[i]);
                     }
                 }
             }
@@ -181,9 +182,11 @@ public class UploaderPanel extends JPanel {
                 FC.setAccessory(null);
                 int ret = FC.showDialog(btnAddImages, "Upload");
                 if(ret == JFileChooser.APPROVE_OPTION) {
-                    for(File dir : FC.getSelectedFiles()) {
-                        for(File f : dir.listFiles()) {
-                            addFileIfOK(f);
+                    File[] dirs = FC.getSelectedFiles();
+                    for(int i=0; i<dirs.length; i++) {
+                        File[] files = dirs[i].listFiles();
+                        for(int j=0; j<files.length; j++) {
+                            addFileIfOK(files[j]);
                         }
                     }
                 }

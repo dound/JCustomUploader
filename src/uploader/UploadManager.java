@@ -253,8 +253,8 @@ public class UploadManager {
 
     /** Starts all of the uploader thread(s). */
     public void start() {
-        for(UploaderThread ut : uploaderThreads)
-            ut.start();
+        for(int i=0; i<uploaderThreads.length; i++)
+            uploaderThreads[i].start();
     }
 
     /**
@@ -300,7 +300,8 @@ public class UploadManager {
         assert SwingUtilities.isEventDispatchThread();
         synchronized(lock) {
             boolean wasInProgress = false;
-            for(UploaderThread ut : uploaderThreads) {
+            for(int i=0; i<uploaderThreads.length; i++) {
+                UploaderThread ut = uploaderThreads[i];
                 if(item == ut.itemBeingUploaded) {
                     ut.cancelCurrentUpload(null); // try to halt the upload in progress
                     wasInProgress = true;
@@ -390,8 +391,8 @@ public class UploadManager {
     private int getNumUploadsInProgress() {
         synchronized(lock) {
             int count = 0;
-            for(UploaderThread ut : uploaderThreads)
-                if(ut.itemBeingUploaded != null)
+            for(int i=0; i<uploaderThreads.length; i++)
+                if(uploaderThreads[i].itemBeingUploaded != null)
                     count += 1;
             return count;
         }
@@ -431,8 +432,8 @@ public class UploadManager {
         synchronized(lock) {
             // compute the average upload rate
             totRecentUploadRate_Bps = 0;
-            for(UploaderThread ut : uploaderThreads)
-                totRecentUploadRate_Bps += ut.recentUploadRate_Bps;
+            for(int i=0; i<uploaderThreads.length; i++)
+                totRecentUploadRate_Bps += uploaderThreads[i].recentUploadRate_Bps;
 
             itemsLeft = getNumItemsLeftToUpload();
             itemsFailed = failedList.size();

@@ -5,11 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.imageio.ImageIO;
-
-import uploader.util.Pair;
 
 /**
  * Ensures that uploaded photos are no larger than a specified size.
@@ -32,7 +29,7 @@ public class ScaledImageGetter extends UploadFileGetter {
      * Returns the InputStream containing the photo (resized if needed) and the
      * number of bytes it contains.
      */
-    public Pair<InputStream, Long> getInputStream(File f) throws IOException {
+    public InputStreamAndSizePair getInputStream(File f) throws IOException {
         BufferedImage img = ImageIO.read(f);
         int w = img.getWidth();
         int h = img.getHeight();
@@ -51,6 +48,6 @@ public class ScaledImageGetter extends UploadFileGetter {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(image, "jpg", byteArrayOutputStream);
         byte[] bytes = byteArrayOutputStream.toByteArray();
-        return new Pair<InputStream, Long>(new ByteArrayInputStream(bytes), (long)bytes.length);
+        return new InputStreamAndSizePair(new ByteArrayInputStream(bytes), bytes.length);
     }
 }

@@ -144,7 +144,7 @@ public class SmugMugUploadMechanism extends HTTPUploadMechanism {
             // we could do this slightly more efficiently if we cached the
             // resized picture's bytes (or computed the MD5 up front) but that
             // would require coupling this more tightly to the UploadFileGetter.
-            md5 = Util.md5( this.getUploadFileGetter().getInputStream(f).a );
+            md5 = Util.md5(this.getUploadFileGetter().getInputStream(f).input);
         }
         catch(Exception e) {
             // send it without the md5 sum if we can't compute it

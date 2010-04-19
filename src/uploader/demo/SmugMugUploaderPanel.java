@@ -206,7 +206,7 @@ public class SmugMugUploaderPanel extends JPanel {
                         if(optNoLimit.isSelected())
                             maxPhotoSideLength = -1; // no limit
                         else {
-                            int v = Integer.valueOf(txtMaxLength.getText());
+                            int v = Integer.parseInt(txtMaxLength.getText());
                             if(v <= 0)
                                 throw new Exception("bad side length (must be greater than 0)");
                             maxPhotoSideLength = v;

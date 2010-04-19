@@ -3,10 +3,9 @@ package uploader.mechanisms;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import uploader.mechanisms.event.UploadFileGetter;
-import uploader.util.Pair;
+import uploader.mechanisms.event.UploadFileGetter.InputStreamAndSizePair;
 
 /**
  * A skeleton UploadMechanism implementation.  Override tryToStartUpload() and
@@ -99,9 +98,9 @@ public abstract class AbstractUploadMechanism implements UploadMechanism {
 
         // open the file
         try {
-            Pair<InputStream, Long> ret = fileGetter.getInputStream(f);
-            currentUploadFile = new BufferedInputStream(ret.a);
-            sz = ret.b;
+            InputStreamAndSizePair ret = fileGetter.getInputStream(f);
+            currentUploadFile = new BufferedInputStream(ret.input);
+            sz = ret.length;
         } catch(IOException e) {
             haltWithError(e.getMessage());
             return -1;
