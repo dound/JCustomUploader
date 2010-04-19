@@ -106,7 +106,7 @@ public class UploaderPanel extends JPanel {
 
         if(FileDrop.supportsDnD()) {
             // show a tip in the upload list box to let users know drag 'n drop is an option
-            lblDragNDropTip = new JLabel("\nYou may also drag files here!", SwingUtilities.CENTER);
+            lblDragNDropTip = new JLabel("You may also drag files here!", SwingUtilities.CENTER);
             lblDragNDropTip.setFont(new Font(lblDragNDropTip.getFont().getName(), Font.BOLD | Font.ITALIC, 24));
             lblDragNDropTip.setForeground(Color.BLUE);
             pnlUploadList.add(lblDragNDropTip, BorderLayout.CENTER);
