@@ -1,8 +1,9 @@
-package uploader;
+package uploader.demo;
 
 import javax.swing.JApplet;
 import javax.swing.SwingUtilities;
 
+import uploader.UploaderPanel;
 import uploader.mechanisms.TestUploadMechanism;
 import uploader.mechanisms.UploadMechanism;
 import uploader.util.ImageFileFilter;
@@ -12,7 +13,7 @@ import uploader.util.ImageFileFilter;
  *
  * @author David Underhill
  */
-public class UploaderApplet extends JApplet {
+public class AppletDemo extends JApplet {
     //Called when this applet is loaded into the browser.
     public void init() {
         try {
@@ -30,7 +31,7 @@ public class UploaderApplet extends JApplet {
         final int NUM_THREADS = 3;
         final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
         for(int i=0; i<NUM_THREADS; i++)
-            uploadMechs[i] = new TestUploadMechanism(250, 0.2, 0.03, System.currentTimeMillis()+i*100);
+            uploadMechs[i] = new TestUploadMechanism(250, 0.2, 0.005, System.currentTimeMillis()+i*100);
         UploaderPanel newContentPane = new UploaderPanel(getWidth(), uploadMechs, "photo", new ImageFileFilter(), true);
         newContentPane.setOpaque(true);
         setContentPane(newContentPane);
