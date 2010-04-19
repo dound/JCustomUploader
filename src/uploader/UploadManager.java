@@ -237,9 +237,9 @@ public class UploadManager {
      * Constructs a new UploadManager which will manage uploads using the
      * specified upload mechanisms.
      *
-     * @param uploaderUI    the UI this manager works for
-     * @param itemType      text describing what kind of items are being uploaded
-     * @param uploadsMechs  how to upload files (one per thread we should use)
+     * @param uploaderUI   the UI this manager works for
+     * @param itemType     text describing what kind of items are being uploaded
+     * @param uploadMechs  how to upload files (one per thread we should use)
      */
     public UploadManager(final UploaderPanel uploaderUI, String itemType, final UploadMechanism[] uploadMechs) {
         assert SwingUtilities.isEventDispatchThread();
