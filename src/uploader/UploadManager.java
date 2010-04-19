@@ -27,9 +27,6 @@ public class UploadManager {
     private static final DecimalFormat SZ_FMT = new DecimalFormat("0.00");
     private static final long CHUNK_SIZE = 4096;
 
-    /** weight of the previous upload rate when computing a new upload rate */
-    private static final double ALPHA = 0.5;
-
     /**
      * Maximum size file which will be accepted.  Note: This can be bypassed if
      * the file is changed between when we are asked to upload it and the time
@@ -141,8 +138,8 @@ public class UploadManager {
             }
 
             // loop until the upload is canceled or done
-            long prevTime = System.currentTimeMillis(), now;
-            double curRate_Bps = 0;
+            final long startTime = System.currentTimeMillis();
+            long now;
             long bytesUploaded = 0;
             long totalBytesUploaded = 0;
             while(item!=null) {
@@ -170,9 +167,9 @@ public class UploadManager {
                     item.setNumBytesUploaded(totalBytesUploaded);
                     incrNumBytesLeftToUpload(-bytesUploaded);
                     now = System.currentTimeMillis();
-                    curRate_Bps = (1000.0*bytesUploaded) / (now - prevTime);
-                    prevTime = now;
-                    recentUploadRate_Bps = (recentUploadRate_Bps*ALPHA) + (1.0-ALPHA)*curRate_Bps;
+                    // wait until some time has elapsed before computing upload speed
+                    if(now > startTime + 50)
+                        recentUploadRate_Bps = (1000.0*totalBytesUploaded) / (now - startTime);
                     updateProgressTexts();
                 }
 
