@@ -44,9 +44,9 @@ public class UploadManager {
     private final UploaderPanel uploaderUI;
 
     /** list of items to upload */
-    private final LinkedList<UploadItem> uploadQueue = new LinkedList<UploadItem>();
-    private final LinkedList<UploadItem> failedList = new LinkedList<UploadItem>();
-    private final LinkedList<UploadItem> completedList = new LinkedList<UploadItem>();
+    private final LinkedList uploadQueue = new LinkedList();
+    private final LinkedList failedList = new LinkedList();
+    private final LinkedList completedList = new LinkedList();
 
     /** whether uploading is enabled */
     private volatile boolean uploadingEnabled = true;
@@ -109,7 +109,7 @@ public class UploadManager {
         private void prepareNextUpload() {
             synchronized(lock) {
                 if(itemBeingUploaded==null && uploadQueue.size()>0) {
-                    UploadItem item = uploadQueue.removeFirst();
+                    UploadItem item = (UploadItem)uploadQueue.removeFirst();
                     itemBeingUploaded = item;
                 }
             }
@@ -347,9 +347,9 @@ public class UploadManager {
         assert SwingUtilities.isEventDispatchThread();
         Container pnlUploadItems = uploaderUI.getUploadItemsContainer();
         synchronized(lock) {
-            ListIterator<UploadItem> itr = completedList.listIterator();
+            ListIterator itr = completedList.listIterator();
             while(itr.hasNext()) {
-                UploadItem item = itr.next();
+                UploadItem item = (UploadItem)itr.next();
                 pnlUploadItems.remove(item);
                 itr.remove();
             }
@@ -367,9 +367,9 @@ public class UploadManager {
     public void retryFailedItems() {
         assert SwingUtilities.isEventDispatchThread();
         synchronized(lock) {
-            ListIterator<UploadItem> itr = failedList.listIterator();
+            ListIterator itr = failedList.listIterator();
             while(itr.hasNext()) {
-                UploadItem item = itr.next();
+                UploadItem item = (UploadItem)itr.next();
                 item.setProgressText("will retry this upload", false);
                 item.setFailed(false);
                 item.setNumBytesUploaded(0);

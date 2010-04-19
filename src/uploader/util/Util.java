@@ -1,7 +1,6 @@
 package uploader.util;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.io.IOException;
@@ -14,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 
 public final class Util {
     private Util() {}
@@ -44,7 +44,7 @@ public final class Util {
     }
 
     /** Sets c's min, max, and preferred sizes to d. */
-    public static final void setSize(Component c, Dimension d) {
+    public static final void setSize(JComponent c, Dimension d) {
         c.setMinimumSize(d);
         c.setPreferredSize(d);
         c.setMaximumSize(d);

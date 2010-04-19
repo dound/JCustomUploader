@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,8 +110,11 @@ public class BasicSmugMugUploader extends JFrame {
                 btnLogin.setEnabled(false);
                 String errMsg = doLogin(txtLogin.getText(), new String(txtPW.getPassword()));
                 if(errMsg == null) {
-                    for(Album a : getAlbums())
+                    ListIterator itr = getAlbums().listIterator();
+                    while(itr.hasNext()) {
+                        Album a = (Album)itr.next();
                         cboAlbums.addItem(a);
+                    }
 
                     BasicSmugMugUploader.this.remove(pnlLogin);
                     BasicSmugMugUploader.this.add(initAlbumPanel());
@@ -280,9 +284,9 @@ public class BasicSmugMugUploader extends JFrame {
     private static final Pattern RE_ALBUMS  = Pattern.compile("<Album id=\"([^\"]+)\" Key=\"[^\"]+\" Title=\"([^\"]+)\">");
 
     /** try to get a list of the albums */
-    private LinkedList<Album> getAlbums() {
+    private LinkedList getAlbums() {
         String resp = fetchURL("https://api.smugmug.com/services/api/rest/1.2.2/?method=smugmug.albums.get&SessionID=" + sessionID);
-        LinkedList<Album> albums = new LinkedList<Album>();
+        LinkedList albums = new LinkedList();
         Matcher album_matcher = RE_ALBUMS.matcher(resp);
         while(album_matcher.find())
             albums.add(new Album(album_matcher.group(1), album_matcher.group(2)));
