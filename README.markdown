@@ -2,64 +2,28 @@ Java Custom Uploader
 =
 
 __About__: A simple, Java-based file uploader with a clean UI.  It can run as an
-applet on your website (Java 1.5 or higher) or as part of a desktop application.
+applet on your website (Java 1.4 or higher) or as part of a desktop application.
+This software is open-source and free to use or include in your own project.
 
 The upload logic is pluggable, so you can use one of the included upload
 mechanisms (e.g., HTTP) _or roll your own_ to upload via whatever protocol you
-need.  The uploader handles automatically parallelizing uploads and providing
-the user with feedback in the case of an error.
+need.  The uploader automatically parallelizes uploads and provides the user
+with feedback on each upload's progress (including errors).
 
-__Demo__: Several examples have been put together:
-
-  1. An applet running the uploader will be posted soon.
-  1. A [basic SmugMug uploader](http://github.com/dound/JCustomUploader/blob/master/src/uploader/demo/BasicSmugMugUploader.java)
-     has been put together to demonstrate the uploader being used as part of a larger application.
-  1. Check out the example at the bottom of this document.
-
+The [__JCustomUploader homepage__](http://www.dound.com/projects/jcustomuploader/) 
+has links to demos, screenshots, and more information about JCustomUploader's 
+features.  This readme is intended to help you get started with JCustomUploader.
 
 Problem?  Please report it on the [JCustomUploader issues
 page](http://github.com/dound/JCustomUploader/issues).
 
 
-Features
--
-  * __Clean, Functional UI__: The user can select multiple files at a time or
-    even folders.  Uploads can be canceled at any time, or retried if they
-    fail.  Information about the overall upload progress and expected completion
-    time is updated as uploads progress and as the user adds files.
-  * __Pluggable Upload Mechanism__: JCustomUploader can upload files using any
-    means you like.  You just extend [AbstractUploadMechanism](http://github.com/dound/JCustomUploader/blob/master/src/uploader/mechanisms/AbstractUploadMechanism.java)
-    which specifies how to start an upload and send a chunk of data.
-    JCustomUploader handles getting the data to you, canceling uploads, and
-    performing multiple uploads in parallel.  It comes with several built-in
-    mechanisms:
-    - HTTP (raw binary data)
-    - HTTP (multipart/form-data encoded)
-    - SmugMug API (with OAuth or SmugMug sessions)
-    - Test (uploads nowhere - useful for testing)
-  * __Custom Hooks__: You can register for callbacks which allow you to
-    pre-process files before uploading them or do some extra processing on the
-    server's response to each upload.
-    - A pre-processor for images which resizes them before uploading them is
-      included.  The example below demonstrates how to use this component.
-  * __Parallel Uploads__: Multiple uploads can be sent in parallel - you just
-    specify the maximum number to try at once and JCustomUploader does the rest.
-  * __Java 1.5__: Only needs Java 1.5 (aka Java 5) or higher to run.
-
-
-Limitations
--
-  * The provided text is in English with no easy hook to provide a custom
-    translation.
-  * Primarily intended to interact with a user, not a program (e.g., there is
-    not great support for pragmatically stop an upload, etc.).  The applet does
-    not expose any hooks which can be called by JavaScript.
-
-
 Usage
 -
-First download and unpack JCustomUploader.  To use the uploader, you will need
-to instantiate an UploaderPanel.  With its constructor you specify:
+First download JCustomUploader - you can either get the source code, or the
+latest pre-compiled jar from the [downloads](http://github.com/dound/JCustomUploader/downloads)
+page.  To use the uploader, you will need to instantiate an UploaderPanel.  With
+its constructor you specify:
 
   - How to upload files and how many uploads to perform in parallel.
   - What kinds of files may be selected.
@@ -69,10 +33,10 @@ to instantiate an UploaderPanel.  With its constructor you specify:
 
 **Using it as an Applet:**
 
-  1. In UploaderApplet.java, modify the arguments to UploaderPanel() to suit
+  1. In AppletDemo.java, modify the arguments to UploaderPanel() to suit
      your needs.
-  1. Build and sign the jar (details coming soon).
-  1. Add it to your webpage (details coming soon).
+  1. Build and sign the jar (the included ant build script, [build.xml](http://github.com/dound/JCustomUploader/blob/master/build.xml), does this).
+  1. Add it to your webpage just like (this demo page)[http://github.com/downloads/dound/JCustomUploader/demo-applet-v1.0.html].
 
 
 **Using it inside your project:**
@@ -81,12 +45,12 @@ to instantiate an UploaderPanel.  With its constructor you specify:
      into your source folder.
   1. Create an UploaderPanel (as above) and display it in a dialog or some
      other Swing container.  [BasicSmugMugUploader](http://github.com/dound/JCustomUploader/blob/master/src/uploader/demo/BasicSmugMugUploader.java)
-     demonstrates this approach (for details, see its documentation).
+     demonstrates this approach.
 
 
 Example Usage
 -
-This example uploader uses three threads and only lets the user upload images:
+This example uploader uses 3 threads and only lets the user upload images:
 
     // obviously you'll want to do this in a method on your applet/application
 
@@ -118,6 +82,15 @@ This example uploader uses three threads and only lets the user upload images:
     UploaderPanel newContentPane = new UploaderPanel(width, uploadMechs, itemType, filter, showPreview);
 
 
+Limitations
+-
+  * The provided text is in English with no easy hook to provide a custom
+    translation.
+  * Primarily intended to interact with a user, not a program (e.g., there is
+    not great support for pragmatically stop an upload, etc.).  The applet does
+    not expose any hooks which can be called by JavaScript.
+
+
 _Author_: [David Underhill](http://www.dound.com)  
-_Release Date_: 2010-Apr-17 (pre-release)  
+_Release Date_: 2010-Apr-20 (v1.0)  
 _License_: Apache License Version 2.0  
