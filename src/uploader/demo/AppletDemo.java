@@ -31,7 +31,7 @@ public class AppletDemo extends JApplet {
         final int NUM_THREADS = 3;
         final UploadMechanism[] uploadMechs = new UploadMechanism[NUM_THREADS];
         for(int i=0; i<NUM_THREADS; i++)
-            uploadMechs[i] = new TestUploadMechanism(100, 0.2, 0.005, System.currentTimeMillis()+i*100);
+            uploadMechs[i] = new TestUploadMechanism(50, 0.2, 0.0005, System.currentTimeMillis()+i*100);
         UploaderPanel newContentPane = new UploaderPanel(getWidth(), uploadMechs, "photo", new ImageFileFilter(), true);
         newContentPane.setOpaque(true);
         setContentPane(newContentPane);
