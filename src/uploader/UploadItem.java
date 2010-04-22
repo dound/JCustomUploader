@@ -226,6 +226,7 @@ public class UploadItem extends JPanel {
                     btnRemove.setIcon(ICON_CHECKMARK);
                     btnRemove.setPressedIcon(ICON_CHECKMARK);
                     btnRemove.setRolloverIcon(ICON_CHECKMARK);
+                    btnRemove.setToolTipText(null);
                     setProgressTextDirectly("uploaded!", false);
                 }
                 else {
