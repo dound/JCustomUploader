@@ -42,6 +42,13 @@ public class UploaderPanel extends JPanel {
     /** size of the margins around the edge of the GUI and between some components */
     private static final int MARGIN_SIZE = 5;
 
+    static {
+        // annoying ui fix: don't let users edit filenames because JFileChooser
+        // has trouble distinguishing between double-clicking to open a folder
+        // or rename it (yuck)
+        UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+    }
+
     // load icons used in the UI
     private static final ImageIcon ICON_ADD = Util.createImageIcon("/resources/add.png");
     private static final ImageIcon ICON_ADD_PRESSED = Util.createImageIcon("/resources/add-press.png");
@@ -83,11 +90,6 @@ public class UploaderPanel extends JPanel {
         this(width, uploadMechs, itemType, filter, true);
     }
     public UploaderPanel(int width, UploadMechanism[] uploadMechs, String itemType, FileFilter filter, boolean useImagePreviewAccessory) {
-        // annoying ui fix: don't let users edit filenames because JFileChooser
-        // has trouble distinguishing between double-clicking to open a folder
-        // or rename it (yuck)
-        UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-
         FC = new JFileChooser();
         FC.setAcceptAllFileFilterUsed(false);
         FC.setMultiSelectionEnabled(true);
