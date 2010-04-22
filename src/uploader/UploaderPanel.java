@@ -42,7 +42,17 @@ public class UploaderPanel extends JPanel {
     /** size of the margins around the edge of the GUI and between some components */
     private static final int MARGIN_SIZE = 5;
 
+    /** default font */
+    private static final Font DEFAULT_FONT      = new Font("SansSerif", Font.PLAIN, 12);
+    private static final Font DEFAULT_FONT_BOLD = new Font("SansSerif", Font.BOLD,  12);
+
     static {
+        UIManager.put("Button.font", DEFAULT_FONT_BOLD);
+        UIManager.put("Label.font", DEFAULT_FONT);
+        UIManager.put("FileChooser.listFont", DEFAULT_FONT);
+        UIManager.put("OptionPane.font", DEFAULT_FONT);
+        UIManager.put("ToolTip.font", DEFAULT_FONT_BOLD);
+
         // annoying ui fix: don't let users edit filenames because JFileChooser
         // has trouble distinguishing between double-clicking to open a folder
         // or rename it (yuck)
