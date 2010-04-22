@@ -152,11 +152,12 @@ public class UploadItem extends JPanel {
         if(showAlert) {
             lblProgress.setIcon(ICON_ALERT);
             lblProgress.setForeground(DARK_RED);
-            lblProgress.setToolTipText(s);
+            lblProgress.setToolTipText("Click the retry button in the buttom-right to try to upload this file again.  Problem: " + s);
         }
         else {
             lblProgress.setIcon(null);
             lblProgress.setForeground(Color.BLACK);
+            lblProgress.setToolTipText(null);
         }
     }
 
