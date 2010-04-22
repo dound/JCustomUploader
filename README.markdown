@@ -36,7 +36,7 @@ its constructor you specify:
   1. In AppletDemo.java, modify the arguments to UploaderPanel() to suit
      your needs.
   1. Build and sign the jar (the included ant build script, [build.xml](http://github.com/dound/JCustomUploader/blob/master/build.xml), does this).
-  1. Add it to your webpage just like (this demo page)[http://github.com/downloads/dound/JCustomUploader/demo-applet-v1.0.html].
+  1. Add it to your webpage just like [this demo page](http://github.com/downloads/dound/JCustomUploader/demo-applet-v1.0.html).
 
 
 **Using it inside your project:**
@@ -82,15 +82,19 @@ This example uploader uses 3 threads and only lets the user upload images:
     UploaderPanel newContentPane = new UploaderPanel(width, uploadMechs, itemType, filter, showPreview);
 
 
-Limitations
+Ideas for Improvement
 -
-  * The provided text is in English with no easy hook to provide a custom
-    translation.
-  * Primarily intended to interact with a user, not a program (e.g., there is
-    not great support for pragmatically stop an upload, etc.).  The applet does
-    not expose any hooks which can be called by JavaScript.
+  * Facilitate easier internationalization.
+  * Enable customization of fonts and colors via property settings.  Currently
+    these can be customized by modifying constants at the top of the relevant 
+    classes ([UploaderPanel](http://github.com/dound/JCustomUploader/blob/master/src/uploader/UploaderPanel.java), 
+    [UploadItem](http://github.com/dound/JCustomUploader/blob/master/src/uploader/UploadItem.java),
+    and [Util](http://github.com/dound/JCustomUploader/blob/master/src/uploader/util/Util.java)).
+  * Add support for more programmatic interaction with the upload manager. There
+    are some callbacks for certain events, but more hooks could be supported.
+    It might also be helpful to expose some hooks to JavaScript code too.
 
 
 _Author_: [David Underhill](http://www.dound.com)  
-_Release Date_: 2010-Apr-20 (v1.0)  
+_Release Date_: 2010-Apr-22 (v1.01)  
 _License_: Apache License Version 2.0  
