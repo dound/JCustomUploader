@@ -16,6 +16,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 
 public final class Util {
+    /** font color to use on buttons */
+    private static final Color BUTTON_FONT_COLOR = Color.BLUE;
+
+    /** whether to give buttons a border and a background */
+    private static final boolean BUTTON_FILL_AREA = false;
+
     private Util() {}
     private static final Util singleton = new Util();
 
@@ -36,11 +42,13 @@ public final class Util {
         b.setRolloverIcon(hover);
         b.setFocusPainted(false);
         b.setMargin(new Insets(1,2,1,2));
-        b.setForeground(Color.BLUE);
+        b.setForeground(BUTTON_FONT_COLOR);
 
         // disable content area fill and border painting to make buttons look more like links
-        //b.setContentAreaFilled(false);
-        //b.setBorderPainted(false);
+        if(!BUTTON_FILL_AREA) {
+            b.setContentAreaFilled(false);
+            b.setBorderPainted(false);
+        }
     }
 
     /** Sets c's min, max, and preferred sizes to d. */
