@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Java Custom Uploader</name>
+	<name>rph-jcustomuploader</name>
 	<comment>Created by David Underhill</comment>
 	<projects>
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.jdt.core.javabuilder</name>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>auto,full,incremental,</triggers>
 			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/Ant Builder (use my build script).launch</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.jdt.core.javabuilder.launch</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
