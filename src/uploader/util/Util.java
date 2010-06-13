@@ -72,7 +72,11 @@ public final class Util {
         is.close();
         byte[] md5sum = digest.digest();
         BigInteger bigInt = new BigInteger(1, md5sum);
-        return bigInt.toString(16);
+        String ret = bigInt.toString(16);
+        while(ret.length() < 32) {
+            ret = "0" + ret; // add any missing leading 0s
+        }
+        return ret;
     }
 
     /**
